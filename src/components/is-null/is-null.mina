@@ -1,0 +1,34 @@
+<config>
+{
+  "component": true
+}
+</config>
+
+<template>
+
+  <view class="is-null">
+    <image src="../../assets/images/colorful-null.png" mode="widthFix"></image>
+    <view class="tips">
+      <slot name="tips">空空如也~</slot>
+    </view>
+  </view>
+</template>
+
+<script>
+Component({
+  properties: {
+
+  },
+  options: {
+    multipleSlots: true // 在组件定义时的选项中启用多slot支持
+  },
+  data:{
+    animation:[],
+    maskAnimation:[]
+  },
+  methods:{
+
+  }
+})
+</script>
+<style lang="scss" src="./is-null.scss"></style>

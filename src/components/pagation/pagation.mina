@@ -1,0 +1,57 @@
+<config>
+{
+  "component": true
+}
+</config>
+
+<template>
+
+  <view class="pagation">
+    <view class="pagation-loading" wx:if="{{params.loading}}">
+      <image src="../../assets/images/loading.svg"></image>
+      正在加载...
+    </view>
+    <view class="nothings" wx:if="{{params.nothing}}">没有更多了~</view>
+    <view class="line" wx:if="{{params.loading || params.nothing}}"></view>
+  </view>
+</template>
+
+<script>
+Component({
+  properties: {
+    params: { // 属性名
+      type: Object, // 类型（必填），目前接受的类型包括：String, Number, Boolean, Object, Array, null（表示任意类型）
+      value: {
+        page:1,
+        totalPage:1,
+        nothing:false,
+        loading:false
+      }, // 属性初始值（可选），如果未指定则会根据类型选择一个
+      observer: function(newVal, oldVal, changedPath) {
+        let animate=wx.createAnimation({duration:250,timingFunction:'ease-out'});
+        if(newVal){
+          animate.top(0).step();
+        }else{
+          animate.top('-100%').step();
+        }
+        this.setData({
+          animation:animate.export(),
+        })
+        // 属性被改变时执行的函数（可选），也可以写成在methods段中定义的方法名字符串, 如：'_propertyChange'
+        // 通常 newVal 就是新设置的数据， oldVal 是旧数据
+      }
+    },
+  },
+  options: {
+    multipleSlots: true // 在组件定义时的选项中启用多slot支持
+  },
+  data:{
+    animation:[],
+    maskAnimation:[]
+  },
+  methods:{
+
+  }
+})
+</script>
+<style lang="scss" src="./pagation.scss"></style>

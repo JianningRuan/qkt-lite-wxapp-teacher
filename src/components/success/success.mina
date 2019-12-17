@@ -1,0 +1,31 @@
+<config>
+{
+  "component": true
+}
+</config>
+
+<template>
+  <view  class="flex flex-v success-template">
+    <view class="success-template-msg flex1 flex flex-align-center">
+      <view class="success-template-msg-warp">
+        <view class="icon"> <image src="../../assets/images/work/success.jpg"></image></view>
+        <view class="title"><slot name="title"></slot></view>
+        <view class="drsc">
+          <slot name="tips"></slot>
+        </view>
+      </view>
+    </view>
+    <view class="success-template-operate ">
+      <slot name="btn"></slot>
+    </view>
+  </view>
+</template>
+
+<script>
+Component({
+  options: {
+    multipleSlots: true // 在组件定义时的选项中启用多slot支持
+  },
+})
+</script>
+<style lang="scss" src="./success.scss"></style>

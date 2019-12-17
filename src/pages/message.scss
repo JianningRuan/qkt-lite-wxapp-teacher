@@ -1,0 +1,42 @@
+@import "../assets/style/base.scss";
+
+#tabbar-message{
+  .mseeage-section-list{
+    margin-top: 30rpx;
+    .message-section-item{
+      padding: 30rpx;
+      .icon{
+        width: 100rpx;
+        height: 100rpx;
+        text-align: center;
+        line-height: 100rpx;
+        border-radius: 50%;
+        background-color: $mainColor;
+        margin-right: 15rpx;
+        image{
+          width: 50rpx;
+          height: 50rpx;
+          display: inline-block;
+          vertical-align: middle;
+        }
+      }
+      .cont{
+        min-width: 0;
+        .name{
+          color: #333333;
+          font-weight: bold;
+        }
+        .drsc{
+          margin-top: 15rpx;
+          font-size: 24rpx;
+          color: #666666;
+          @extend .textOverflowEllipsis;
+        }
+      }
+      .time{
+        font-size: 24rpx;
+        color: #666666;
+      }
+    }
+  }
+}

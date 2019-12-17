@@ -1,0 +1,114 @@
+@import "../../assets/style/base.scss";
+page{
+  padding: 30rpx;
+  box-sizing: border-box;
+}
+
+#work-detail{
+  height: 100%;
+  box-sizing: border-box;
+
+
+  .user{
+    font-size: 24rpx;
+    color: #999999;
+    border-bottom: 1px solid #f8c9ce;
+    padding-bottom: 30rpx;
+    .no{
+      margin-right: 15rpx;
+    }
+    .avatar{
+      @include avatar(72rpx);
+      margin-right: 15rpx;
+    }
+  }
+  .wrok-detail-main{
+    padding-bottom: 15rpx;
+
+    margin-top: 30rpx;
+    &.IsShowToggle{
+      height: 600rpx;
+      overflow: hidden;
+      border-bottom: 0;
+    }
+
+    .work-detail-item{
+      margin-bottom: 30rpx;
+      .work-name{
+        color: #666666;
+      }
+      .work-audio-list{
+        font-size: 0;
+        margin-top: 30rpx;
+        .audio-item{
+          display: inline-block;
+          width: calc((100% - (30rpx * 2) - 12rpx) / 3);
+          border: 1rpx solid $mainColor;
+          border-radius: 10rpx;
+          margin-right: 30rpx;
+          margin-bottom: 30rpx;
+          &:nth-child(3n){
+            margin-right: 0;
+          }
+          .control{
+            height: 140rpx;
+            position: relative;
+            .icon{
+              width: 72rpx;
+              height: 72rpx;
+              text-align: center;
+              line-height: 72rpx;
+              border-radius: 50%;
+              background: $mainColor;
+              color: #ffffff;
+              margin: 0 auto;
+              z-index: 5;
+
+              text{
+                font-size: 40rpx;
+              }
+            }
+            .bg{
+              position: absolute;
+              width: 100%;
+              left: 0;
+              bottom: 0;
+              height: 55rpx;
+            }
+          }
+          .time{
+            line-height: 56rpx;
+            color: $mainColor;
+            background-color: #e8f3ff;
+            padding: 0 25rpx;
+            text-align: right;
+            border-radius: 0 0 10rpx 10rpx;
+            border-top: 1px solid $mainColor;
+            font-size: 28rpx;
+          }
+        }
+      }
+    }
+  }
+  .more{
+    margin-top: 30rpx;
+    color: $mainColor;
+  }
+
+  .work-detail-comment{
+    border-top: 1px solid #e5e5e5;
+    margin-top: 30rpx;
+    padding-top: 30rpx;
+
+    .tips{
+      font-size: 24rpx;
+      color: #999999;
+      margin-top: 30rpx;
+    }
+  }
+  .operate{
+    margin-top: 30rpx;
+    border-top: 1px solid #e5e5e5;
+    padding-top: 30rpx;
+  }
+}

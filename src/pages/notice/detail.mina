@@ -1,0 +1,225 @@
+<config>
+{
+  "navigationBarTitleText":"通知详情",
+  "usingComponents": {
+    "is-null": "../../components/is-null/is-null.mina",
+  }
+}
+</config>
+
+
+
+<template>
+  <view class="notice-detail">
+    <view class="notice-msg section-item">
+      <view class="top">
+        <view class="base-msg flex flex-align-center">
+          <image src="../../assets/images/home/vote.svg" wx:if="{{notice.type==2}}"></image>
+          <image src="../../assets/images/home/voice.svg" wx:elif="{{notice.type==1}}"></image>
+          <view class="name flex1">{{notice.title}}</view>
+          <view class="time">
+            <block wx:if="{{notice.lastday>0}}">{{notice.lastday}}天截止</block>
+            <block wx:elif="{{notice.lastday==0}}">{{notice.lastime}}截止</block>
+            <block wx:elif="{{notice.lastday<0}}">已截止</block>
+          </view>
+        </view>
+        <view class="schedu flex flex-align-center">
+          <view class="finish flex1">{{notice.type==2?'已投票':'已读'}}：{{readUserList.length}}/{{userList.length}}</view>
+          <!--<text class="btn btn-primary">通知完成</text>-->
+        </view>
+      </view>
+      <view class="content">
+        {{notice.content}}
+      </view>
+      <view class="image-list" wx:if="{{attachList.length>0}}">
+        <view class="image-item"   style="background-image: url('{{item.attachUrl}}')" catchtap="prevImg" data-index="{{index}}" wx:for="{{attachList}}" wx:key="{{index}}">
+        </view>
+      </view>
+    </view>
+
+    <view class="notice-detail-show section-item">
+      <view class="tab flex flex-align-center">
+        <text class="tab-item flex1 {{tabActive==3?'active':''}}" catchtap="changeTab" data-value="3" wx:if="{{notice.type==2}}">统计</text>
+        <text class="tab-item flex1 {{tabActive==1?'active':''}}" catchtap="changeTab" data-value="1">{{notice.type==2?'已投票':'已读'}}</text>
+        <text class="tab-item flex1 {{tabActive==2?'active':''}}" catchtap="changeTab" data-value="2">{{notice.type==2?'未投票':'未读'}}</text>
+      </view>
+      <view class="tab-cont">
+        <view class="total" wx:if="{{tabActive==3}}">
+          <view class="total-item flex flex-align-center" wx:for="{{optionList}}" wx:key="{{index}}">
+            <text class="flex1">{{item.optionNum==1?'A':item.optionNum==2?'B':item.optionNum==3?'C':item.optionNum==4?'D':item.optionNum==5?'E':item.optionNum==6?'F':item.optionNum==7?'G':item.optionNum==8?'H':item.optionNum==9?'I':item.optionNum==10?'J':item.optionNum==11?'K':item.optionNum==12?'L':''}}.{{item.optionContent}}</text>
+            <text>{{item.total || 0}}人（{{item.percent}}%）</text>
+          </view>
+        </view>
+        <view class="user-list">
+          <block wx:if="{{tabActive==1}}">
+            <block wx:if="{{readUserList.length>0}}"><view class="user-item flex flex-align-center"  wx:for="{{readUserList}}" wx:key="{{index}}">
+              <view class="avatar">
+                <image src="{{item.pic}}" wx:if="{{item.pic && item.pic!=''}}"></image>
+                <image src="../../assets/images/avatar.png" wx:else></image>
+              </view>
+              <view class="name flex1">{{item.userName}}</view>
+              <view class="value">
+                <block wx:if="{{notice.type==2}}">
+                  选择{{item.optionNum==1?'A':item.optionNum==2?'B':item.optionNum==3?'C':item.optionNum==4?'D':item.optionNum==5?'E':item.optionNum==6?'F':item.optionNum==7?'G':item.optionNum==8?'H':item.optionNum==9?'I':item.optionNum==10?'J':item.optionNum==11?'K':item.optionNum==12?'L':''}}
+                </block>
+                <block wx:else>
+                  已读
+                </block>
+              </view>
+            </view></block>
+            <block wx:else><is-null><text slot="tips">空空如也</text> </is-null></block>
+          </block>
+          <block wx:elif="{{tabActive==2}}">
+            <block wx:if="{{unReadUserlist.length>0}}"><view class="user-item flex flex-align-center" wx:for="{{unReadUserlist}}" wx:key="{{index}}">
+              <view class="avatar">
+                <image src="{{item.pic}}" wx:if="{{item.pic && item.pic!=''}}"></image>
+                <image src="../../assets/images/avatar.png" wx:else></image>
+              </view>
+              <view class="name flex1">{{item.userName}}</view>
+              <view class="value red">
+                <block wx:if="{{notice.type==2}}">
+                  未选择
+                </block>
+                <block wx:else>
+                  未读
+                </block>
+              </view>
+            </view></block>
+            <block wx:else><is-null><text slot="tips">空空如也</text> </is-null></block>
+          </block>
+          <block wx:elif="{{tabActive==3}}">
+            <block wx:if="{{userList.length>0}}"><view class="user-item flex flex-align-center" wx:for="{{userList}}" wx:for="{{index}}">
+              <view class="avatar">
+                <image src="{{item.pic}}" wx:if="{{item.pic && item.pic!=''}}"></image>
+                <image src="../../assets/images/avatar.png" wx:else></image>
+              </view>
+              <view class="name flex1">{{item.userName}}</view>
+              <view class="value {{(notice.type==2 && item.optionId==0) || (notice.type!=2 && item.status==0)?'red':''}}">
+                <block wx:if="{{notice.type==2}}">
+                  {{item.optionId==0?'未投票':'已投票'}}
+                </block>
+                <block wx:else>
+                  {{item.status==0?'未读':'已读'}}
+                </block>
+              </view>
+            </view></block>
+            <block wx:else><is-null><text slot="tips">空空如也</text> </is-null></block>
+          </block>
+        </view>
+      </view>
+    </view>
+
+  </view>
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import dayjs from 'dayjs'
+  Page.define({
+    data: {
+      notice:{},
+      userList:[],
+      readUserList:[],
+      unReadUserlist:[],
+      optionList:[],
+      attachList:[],
+      tabActive:1,
+    },
+    async onLoad(){
+      let id = this.$route.query.id;
+      this.getNoticeDetail(id);
+    },
+    methods:{
+      async getNoticeDetail(id){
+        let res=await this.$api.notice.show({noticeId:id});
+        let _readUserList=[];
+        let _unReadUserList=[];
+        let key='';
+        if(res.data.notice.type==2){//投票
+          key='optionId';
+          this.setData({
+            tabActive:3
+          })
+        }else{
+          key='status';
+        }
+        res.data.userList.map((item)=>{
+          if(item[key]==0){
+            _unReadUserList.push(item);
+          }else{
+            _readUserList.push(item);
+            if(res.data.notice.type==2){
+              for(let i=0;i<res.data.optionList.length;i++){
+                if(res.data.optionList[i].id==item[key]){
+                  item.optionNum=res.data.optionList[i].optionNum;
+                  res.data.optionList[i].total=res.data.optionList[i].total?res.data.optionList[i].total+1:1;
+                  break;
+                }
+              }
+            }
+          }
+        });
+        if(res.data.notice.type==2){
+          res.data.optionList.map((item)=>{
+            if(item.total){
+              item.percent=(item.total/_readUserList.length)*100;
+            }else{
+              item.percent=0;
+            }
+          })
+        }
+        let date1=dayjs(res.data.notice.endTime);
+        let date2=dayjs();
+        res.data.notice.lastday=date1.diff(date2, 'day');
+        if(res.data.notice.lastday==0){
+          let _date1=dayjs().format('YYYYMMDD');
+          let _date2=dayjs(res.data.notice.endTime).format('YYYYMMDD');
+          if(_date1==_date2){
+            res.data.notice.lastime='今天';
+            let time1=parseInt(dayjs().format('HHmm'));
+            let time2=parseInt(dayjs(res.data.notice.lastime).format('HHmm'));
+            if(time1>time2){
+              res.data.notice.lastime+=dayjs(res.data.notice.lastime).format('HH:mm');
+            }else{
+              res.data.notice.lastime='已'
+            }
+          }else{
+            res.data.notice.lastime='明天'
+            res.data.notice.lastime+=dayjs(res.data.notice.endTime).format('HH:mm');
+          }
+
+        }
+        if(res.rcode=='300'){
+          this.setData({
+            notice:res.data.notice,
+            userList:res.data.userList,
+            readUserList:_readUserList,
+            unReadUserlist:_unReadUserList,
+            optionList:res.data.optionList,
+            attachList:res.data.attachList
+          })
+        }
+      },
+      changeTab(e){
+        let value=e.currentTarget.dataset.value;
+        if(this.data.tabActive!=value){
+          this.setData({
+            tabActive:value
+          })
+        }
+      },
+      prevImg(e){
+        let index=e.currentTarget.dataset.index;
+        let imgs=[];
+        this.data.attachList.map((item)=>{
+          imgs.push(item.attachUrl);
+        })
+        wx.previewImage({
+          current: this.data.attachList[index].attachUrl, // 当前显示图片的http链接
+          urls: imgs // 需要预览的图片http链接列表
+        });
+      },
+    }
+  })
+</script>
+<style lang="scss" src="./detail.scss"></style>

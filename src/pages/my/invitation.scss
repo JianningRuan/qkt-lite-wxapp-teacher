@@ -1,0 +1,82 @@
+.share-wrapper {
+  padding: 40px 60px;
+  .share-box {
+    position: relative;
+    .share-pic {
+      width: 630px;
+      height: 1004px;
+    }
+    .share-tch-msg {
+      position: absolute;
+      left: 92px;
+      top: 166px;
+      .tch-pic {
+        width: 80px;
+        height: 80px;
+        border-radius: 40px;
+        overflow: hidden;
+        margin-right: 24px;
+        image {
+          width: 80px;
+          height: 80px;
+          display: block;
+        }
+      }
+      .tch-name {
+        font-size: 28px;
+        color: #63cdee;
+      }
+      .tch-text {
+        font-size: 26px;
+        color: #333;
+      }
+    }
+    .class-name {
+      width: 444px;
+      height: 77px;
+      text-align: center;
+      line-height: 77px;
+      font-size: 40px;
+      color: #f99d1b;
+      font-weight: bold;
+      position: absolute;
+      left: 95px;
+      top: 293px;
+    }
+    .code {
+      width: 162px;
+      height: 162px;
+      position: absolute;
+      left: 105px;
+      top: 738px;
+      image {
+        width: 162px;
+        height: 162px;
+        display: block;
+      }
+    }
+  }
+
+  .copy-btn {
+    width: 100%;
+    height: 88px;
+    line-height: 88px;
+    border-radius: 44px;
+    text-align: center;
+    color: #fff;
+    font-size: 32px;
+    background: #8bd1e7;
+    &.grey-btn {
+      background: #f9f9f9;
+      color: #999999;
+    }
+  }
+}
+
+.canvas {
+  width: 1260px;
+  height: 2008px;
+  position: absolute;
+  top: -2208px;
+  left: 0;
+}

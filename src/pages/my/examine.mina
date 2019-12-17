@@ -1,0 +1,237 @@
+<config>
+  {
+    "navigationBarTitleText":"审核名单",
+    "usingComponents": {
+      "modal": "../../components/modal/modal.mina",
+      "is-null": "../../components/is-null/is-null.mina",
+    }
+  }
+</config>
+<template>
+  <view class="examine-wrapper pt-20">
+    <view class="bg">
+      <image src="../../assets/images/class/class-top.jpg"></image>
+    </view>
+
+    <view class="box">
+      <view class="class-box">
+        <view class="class-tit master-tit flex flex-align-center">
+          <view class="label"></view>
+          <view class="class-name">申请列表</view>
+          <view class="invitation-btn" catchtap="allPass">一键通过</view>
+        </view>
+        <view class="stu-list mb-20">
+          <block wx:if="{{studentList.length > 0}}">
+          <view class="stu-item flex flex-align-center flex-pack-justify" wx:for="{{studentList}}" wx:for-index="idx" wx:key="{{item.id}}">
+            <view class="flex">
+              <view class="stu-head-pic">
+                <image src="{{item.pic}}" wx:if="{{item.pic && item.pic !== '' && item.pic !== null}}"></image>
+                <image src="../../assets/images/avatar.png" wx:else></image>
+              </view>
+              <view class="flex flex-v flex-pack-justify">
+                <view class="stu-name">{{item.name}}</view>
+                <view class="stu-tips">申请进入{{className}}</view>
+              </view>
+            </view>
+            <view class="flex" wx:if="{{item.state === null}}">
+              <view class="refuse-btn" data-index="{{idx}}" catchtap="refuse">拒绝</view>
+              <view class="pass-btn" data-index="{{idx}}" catchtap="pass">通过</view>
+            </view>
+            <view class="result" wx:else>
+              <text wx:if="{{item.state}}">已通过</text>
+              <text wx:else>已拒绝</text>
+            </view>
+          </view>
+          </block>
+          <block wx:else>
+            <is-null><text slot="tips">暂时还没有学生进班快邀请学生进班吧</text></is-null>
+          </block>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <modal visable="{{isShowPassModal}}" bindmodaltoggle="hidePassModal">
+    <text slot="header">温馨提示</text>
+    <view slot="body">是否通过全部学生的审核？</view>
+    <view slot="footer" class="btn-group flex">
+      <text class="btn btn-gray btn-plain btn-lg flex1" catchtap="hidePassModal">取消</text>
+      <text class="btn btn-primary btn-lg flex1" catchtap="submitPass">通过</text>
+    </view>
+  </modal>
+</template>
+<script>
+  import {Page} from '@tinajs/tina';
+  import wechat from '@/until/wechat'
+  Page.define({
+    data: {
+      classId: '',
+      className: '',
+      studentList: [],
+      isShowPassModal: false,
+      waitPassStu: 0, // 等待通过的学生数量
+    },
+    beforeLoad() {
+    },
+    onLoad() {
+
+    },
+    onReady() {
+    },
+    onShow() {
+      if(this.$route.query.id){
+        this.setData({
+          classId: this.$route.query.id
+        })
+      }
+      if (this.$route.query.className) {
+        this.setData({
+          className: this.$route.query.className
+        })
+      }
+
+      this.getApplyStuList()
+    },
+    onHide() {
+    },
+    onUnload() {
+    },
+    compute() {
+    },
+    methods: {
+      getApplyStuList () {
+        let params = {
+          classysId: this.data.classId
+        }
+        this.$api.classroom.queryApply(params).then((res) => {
+          if (res.rcode === 300) {
+            let studentList = res.data.studentList
+            let waitPassStu = 0;
+            studentList.forEach((value) => {
+              if (value.state === null) {
+                waitPassStu++
+              }
+            })
+            this.setData({
+              studentList: studentList,
+              waitPassStu: waitPassStu
+            })
+          }
+        })
+      },
+      // 单人拒绝
+      refuse (e) {
+        let index = parseInt(e.currentTarget.dataset.index);
+        let applyList = []
+        let paramsItem = {
+          classysId: this.data.classId,
+          state: false,
+          studentId: this.data.studentList[index].id
+        }
+        applyList.push(paramsItem)
+        let params = {
+          applyList
+        }
+        this.$api.classroom.dealApply(params).then((res) => {
+          if (res.rcode === 300) {
+            wx.showToast({
+              title: '已拒绝',
+              duration: 2000
+            })
+            this.data.studentList[index].state = false
+            this.data.waitPassStu--
+            this.setData({
+              studentList: this.data.studentList,
+              waitPassStu: this.data.waitPassStu
+            })
+          } else {
+            this.$toast(res.message)
+            this.getApplyStuList()
+          }
+        })
+      },
+      // 单人通过
+      pass (e) {
+        let index = parseInt(e.currentTarget.dataset.index);
+        let applyList = []
+        let paramsItem = {
+          classysId: this.data.classId,
+          state: true,
+          studentId: this.data.studentList[index].id
+        }
+        applyList.push(paramsItem)
+        let params = {
+          applyList
+        }
+        this.$api.classroom.dealApply(params).then((res) => {
+          if (res.rcode === 300) {
+            wx.showToast({
+              title: '已通过',
+              duration: 2000
+            })
+            this.data.studentList[index].state = true
+            this.data.waitPassStu--
+            this.setData({
+              studentList: this.data.studentList,
+              waitPassStu: this.data.waitPassStu
+            })
+          } else {
+            this.$toast(res.message)
+            this.getApplyStuList()
+          }
+        })
+      },
+      // 一键通过
+      allPass () {
+        if (this.data.waitPassStu === 0) {
+          this.$toast('没有申请的学生')
+          return
+        }
+        this.setData({
+          isShowPassModal: true
+        })
+      },
+      //
+      hidePassModal () {
+        this.setData({
+          isShowPassModal: false
+        })
+      },
+      submitPass () {
+        let applyList = []
+        this.data.studentList.forEach(value => {
+          if (value.state === null) {
+            let paramsItem = {
+              classysId: this.data.classId,
+              state: true,
+              studentId: value.id
+            }
+            applyList.push(paramsItem)
+          }
+        })
+        let params = {
+          applyList
+        }
+        this.$api.classroom.dealApply(params).then((res) => {
+          if (res.rcode === 300) {
+            wx.showToast({
+              title: '已通过',
+              duration: 2000
+            })
+            this.data.studentList.forEach(value => {
+              if (value.state === null) {
+                value.state = true
+              }
+            })
+            this.setData({
+              waitPassStu: 0,
+              studentList: this.data.studentList,
+              isShowPassModal: false
+            })
+          }
+        })
+      },
+    }
+  })
+</script>
+<style lang="scss" src="./examine.scss"></style>

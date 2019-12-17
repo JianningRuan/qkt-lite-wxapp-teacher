@@ -1,0 +1,344 @@
+<config>
+{
+  "navigationBarTitleText":"作业详情",
+  "usingComponents": {
+    "is-null": "../../components/is-null/is-null.mina",
+    "modal": "../../components/modal/modal.mina"
+  }
+}
+</config>
+
+
+
+<template>
+  <view class="work-info">
+    <view class="work-info-chart section-item ">
+      <view class="top flex flex-align-center">
+        <image class="icon" wx:if="{{work.subjectId === 1}}" src="~@/assets/images/work/cn-icon.png"></image>
+        <image class="icon" wx:elif="{{work.subjectId === 2}}" src="~@/assets/images/work/math-icon.png"></image>
+        <image class="icon" wx:else src="~@/assets/images/work/en-icon.png"></image>
+        <view class="name flex1">{{work.title}}</view>
+        <view class="more iconfont icon-more" catchtap="changeIsShowMore" wx:if="{{work.hasEdit && !work.isEnd}}">
+          <view class="dropDownSelect" wx:if="{{isShowMore}}">
+            <view class="dropDownSelect-list">
+              <view class="dropDownSelect-item mainColor" bindtap="toEdit" wx:if="{{work.homeworkItems[0].type!=4}}">
+                <text class="iconfont icon-edit"></text>
+                <text class="value">编辑修改</text>
+              </view>
+              <view class="dropDownSelect-item " bindtap="toggleModal">
+                <text class="iconfont icon-delete"></text>
+                <text class="value">删除作业</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="finish" wx:else>完成:{{work.fStudents.length}}/{{work.fStudents.length+work.ufStudents.length}}</view>
+      </view>
+      <view class="cont {{isHiddenWorkDetail?'hidden':''}}" id="chart-warp">
+        <view class="work-item-task" wx:for="{{work.homeworkItems}}" wx:for-item="task" wx:for-index="taskIndex" wx:key="{{taskIndex}}">
+          <block wx:if="{{task.type==4}}">
+            {{task.execTimeTotal}}分钟口算作业，达标分数{{task.execScore}}分
+          </block>
+          <block wx:else>
+            <view class="title">{{taskIndex+1}}.{{task.title}}</view>
+            <view class="image-list" wx:if="{{task.attachment && task.attachment.length>0}}" >
+              <view class="image-item" wx:for="{{task.attachment}}" wx:for-item="img" wx:for-index="imgIndex" wx:key="{{imgIndex}}"  style="background-image: url('{{img}}')" catchtap="prevImg" data-imgs="{{task.attachment}}" data-index="{{imgIndex}}" ></view>
+            </view>
+          </block>
+        </view>
+      </view>
+      <view class="toggle-btn text-right">
+        <text catchtap="toggleIsHiddenWorkDetail">{{isHiddenWorkDetail?'展开':'收起'}}</text>
+      </view>
+    </view>
+
+    <view class="section work-info-unFiniseh">
+      <view class="section-top flex flex-align-center">
+        <text class="section-title flex1">未完成名单</text>
+        <text class="btn {{work && work.isNoticed?'btn-gray':'btn-primary'}}" catchtap="noticeStuForWork" wx:if="{{ufStudents && ufStudents.length>0}}">通知完成</text>
+      </view>
+      <view class="cont">
+        <view class="unFiniseh-list">
+          <block wx:if="{{ufStudents && ufStudents.length>0}}">
+            <view class="unFiniseh-item" wx:for="{{ufStudents}}" wx:key="{{index}}">
+              <view class="avatar">
+                <image src="{{item.head}}" wx:if="{{item.head && item.head!=''}}"></image>
+                <image src="../../assets/images/avatar.png" wx:else></image>
+              </view>
+              <view class="name">{{item.name}}</view>
+            </view>
+            <view class="more" wx:if="{{work.ufStudents.length>6}}" catchtap="toggleShow">{{toggleShowAll?'收起':'查看全部'}}</view>
+          </block>
+          <block wx:else>
+            <is-null><text slot="tips">学生都全部完成了哦~</text> </is-null>
+          </block>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-top flex flex-align-center">
+        <text class="section-title flex1">作业详情</text>
+        <view class="screen" wx:if="{{work.homeworkItems[0].type==4}}" catchtap="toggleShowScreen">
+          筛选({{screenIndex==0?'全部':screenIndex==1?'达标':screenIndex==2?'未达标':''}})
+          <view class="dropDownSelect" wx:if="{{isShowScreen}}" catchtap="toggleIsShowScreen">
+            <view class="dropDownSelect-list ">
+              <view class="dropDownSelect-item" bindtap="screenFs" data-type="all" data-index="0">
+                <text class="value">全部</text>
+              </view>
+              <view class="dropDownSelect-item " bindtap="screenFs" data-type="pass" data-index="1">
+                <text class="value">达标</text>
+              </view>
+              <view class="dropDownSelect-item " bindtap="screenFs" data-type="unPass" data-index="2">
+                <text class="value">未达标</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="cont">
+        <view class="common-user-list">
+          <block wx:if="{{work && work.fStudents && work.fStudents.length>0}}">
+            <view class="common-user-item flex flex-align-center" wx:for="{{work.fStudents}}" wx:key="{{index}}">
+              <text class="no"><block wx:if="{{index<9}}">0</block>{{index+1}}</text>
+              <view class="avatar">
+                <image src="{{item.head}}" wx:if="{{item.head && item.head!=''}}"></image>
+                <image src="../../assets/images/avatar.png" wx:else></image>
+              </view>
+              <view class="name flex1">{{item.name}}</view>
+              <!--口算-->
+              <block wx:if="{{work.homeworkItems[0].type==4}}">
+                <text class="blue">{{item.execIsReach?'达标':'未达标'}}({{item.execScore}})</text>
+              </block>
+              <!--非口算-->
+              <block wx:else>
+                <text class="blue" catchtap="toStuWork" data-index="{{index.length==1?'0'+index:index}}" data-id="{{item.homeworkRecordId}}">查看</text>
+              </block>
+            </view>
+          </block>
+          <block wx:else>
+            <is-null><text slot="tips">暂无学生完成作业</text> </is-null>
+          </block>
+        </view>
+      </view>
+    </view>
+  </view>
+
+
+  <modal visable="{{visable}}" bindmodaltoggle="toggleModal">
+    <text slot="header">温馨提示</text>
+    <view  slot="body">
+      是否确定删除 {{work.title}}?
+    </view>
+    <view slot="footer" class="btn-group flex flex-align-center" >
+      <text class="btn btn-gray btn-plain btn-lg flex1" catchtap="toggleModal">取消</text>
+      <text class="btn btn-primary btn-lg flex1" catchtap="deleteWork">确定</text>
+    </view>
+  </modal>
+
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import dayjs from 'dayjs'
+  import wechat from '@/until/wechat'
+  import { tinax } from '@/store'
+
+  Page.define({
+    mixins: [
+      tinax.connect({
+        actions ({deleteItemById}) {
+          return {
+            deleteItemById,
+          }
+        },
+      }),
+    ],
+    data: {
+      work:{},
+      ufStudents:[],
+      toggleShowAll:false,
+      isShowMore:false,
+      isShowScreen:false,
+      visable:false,
+      screenIndex:0,
+      isHiddenWorkDetail:false
+    },
+    async onLoad(){
+      /*let res =await wechat.getView('#chart-warp');
+      let width=res[0].width/2;
+      this.setData({
+        canvasWidth:width
+      })
+      new wxCharts({
+        canvasId: 'ringCanvas',
+        type: 'ring',
+        series: [{
+          name: '已完成 15',
+          data: 15,
+          color:'#eab925',
+          format:(e)=>{
+            return 10;
+          }
+        }, {
+          name: '未完成 35',
+          data: 35,
+          color:'#8bd1e7'
+        }],
+        width: width,
+        height: 150,
+        dataLabel: false,
+        legend:false
+      });*/
+
+
+    },
+    onShow(){
+      if(this.$route.query.id){
+        this.workId=this.$route.query.id;
+        this.getWorkInfo(this.$route.query.id);
+      }
+    },
+    methods:{
+      async getWorkInfo(id){
+        let res=await this.$api.work.show({homeworkId:id});
+
+        if(res.rcode==300){
+          res.data.submitDate=res.data.submitDate.replace(/-/g,'/');
+          let isEnd=dayjs().isBefore(dayjs(res.data.submitDate));
+          if(isEnd){
+            res.data.isEnd=false;
+          }else{
+            res.data.isEnd=true;
+          }
+          //口算
+          if(res.data.homeworkItems[0].type==4){
+            this.allFStudents=JSON.parse(JSON.stringify(res.data.fStudents));
+            this.passFStudents=[];
+            this.unPassFStudents=[];
+            this.allFStudents.map((item)=>{
+              if(item.execIsReach){
+                this.passFStudents.push(item);
+              }else{
+                this.unPassFStudents.push(item);
+              }
+            })
+          }
+          let _ufStudents=JSON.parse(JSON.stringify(res.data.ufStudents));
+          if(_ufStudents.length>6){
+            this.setData({
+              ufStudents:_ufStudents.splice(5,_ufStudents.length-1)
+            })
+          }else{
+            this.setData({
+              ufStudents:_ufStudents
+            })
+          }
+          this.setData({
+            work:res.data
+          })
+        }
+      },
+      async noticeStuForWork(id){
+        if(!this.data.work.isNoticed){
+          let res=await this.$api.work.sendNotice({
+            homeworkId:this.workId
+          });
+          if(res.rcode==300){
+            this.data.work.isNoticed=true;
+            this.setData({
+              work:this.data.work
+            });
+            this.$message.success('发送通知成功');
+          }
+        }
+      },
+      toStuWork(e){
+        let id=e.currentTarget.dataset.id;
+        let index=e.currentTarget.dataset.index;
+        this.$router.navigate(`/pages/work/detail?id=${id}&index=${index}`);
+      },
+      toggleShow(){
+        if(this.data.toggleShowAll){
+          this.data.ufStudents.splice(5,this.data.ufStudents.length-1);
+          this.setData({
+            ufStudents:this.data.ufStudents,
+            toggleShowAll:false
+          })
+        }else{
+          this.setData({
+            ufStudents:this.data.work.ufStudents,
+            toggleShowAll:true
+          })
+        }
+      },
+      toggleShowScreen(){
+        this.setData({
+          isShowScreen:!this.data.isShowScreen
+        })
+      },
+      prevImg(e){
+        let index=e.currentTarget.dataset.index;
+        let imgs=e.currentTarget.dataset.imgs;
+        wx.previewImage({
+          current: imgs[index], // 当前显示图片的http链接
+          urls: imgs // 需要预览的图片http链接列表
+        });
+      },
+      changeIsShowMore(){
+        this.setData({
+          isShowMore:!this.data.isShowMore
+        })
+      },
+      toEdit(){
+        this.$router.navigate(`/pages/work/publish?id=${this.workId}`)
+      },
+      toggleModal(e){
+        debugger;
+        if(e && e.type && e.type=='modaltoggle'){
+          this.setData({
+            visable:e.detail
+          })
+        }else{
+          this.setData({
+            visable:!this.data.visable
+          })
+        }
+      },
+      async deleteWork(){
+        let res=await this.$api.work.remove({homeworkId:this.workId});
+        debugger;
+        if(res.rcode==300){
+          this.toggleModal();
+          debugger;
+          this.deleteItemById({id:this.workId});
+          this.$message.success('删除成功').then((res)=>{
+            this.$router.back();
+          })
+        }
+      },
+      toggleIsShowScreen(){
+        this.setData({
+          isShowScreen:!this.data.isShowScreen
+        })
+      },
+      //展开或显示作业详情
+      toggleIsHiddenWorkDetail(e){
+        this.setData({
+          isHiddenWorkDetail:!this.data.isHiddenWorkDetail
+        });
+      },
+      screenFs(e){
+        let type=e.currentTarget.dataset.type;
+        let index=parseInt(e.currentTarget.dataset.index);
+        this.data.work.fStudents=this[type+'FStudents'];
+        this.setData({
+          work:this.data.work,
+          screenIndex:index
+        });
+      }
+    }
+
+  })
+</script>
+<style lang="scss" src="./info.scss"></style>

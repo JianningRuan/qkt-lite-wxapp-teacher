@@ -1,0 +1,53 @@
+@import "../../assets/style/base.scss";
+
+.my-info{
+  padding: 30rpx;
+  .section{
+    border-top: 0;
+    .section-top{
+      border-bottom: 0;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  .key{
+    color: #999999;
+    margin-right: 30rpx;
+  }
+
+  .value{
+    color: #333333;
+  }
+
+  .user-info-list{
+    .user-info-item{
+      margin-bottom: 15rpx;
+      &:last-child{
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .class-info-list{
+    .class-info-item{
+      padding: 0;
+      .top{
+        background: $mainColor;
+        line-height: 70rpx;
+        padding: 0 30rpx;
+        color: #ffffff;
+        border-radius: 10rpx 10rpx 0 0;
+      }
+      .cont{
+        padding: 30rpx;
+        .class-info-item-msg{
+          margin-bottom: 15rpx;
+          &:last-child{
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+}

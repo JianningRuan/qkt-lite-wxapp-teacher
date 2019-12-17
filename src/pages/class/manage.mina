@@ -1,0 +1,325 @@
+<config>
+{
+  "navigationBarTitleText":"班级管理",
+  "usingComponents": {
+    "modal": "../../components/modal/modal.mina",
+    "is-null": "../../components/is-null/is-null.mina",
+  }
+}
+</config>
+
+<template>
+  <view class="class-manage">
+    <view class="bg">
+      <image src="../../assets/images/class/class-top.jpg"></image>
+    </view>
+    <picker bindchange="bindPickerChange" value="{{classIndex}}" range="{{classArr}}" range-key="name">
+      <view class="class-tit flex flex-align-center flex-pack-center"><text>{{showClassList[classIndex].className}}</text><text class="down iconfont icon-down"></text></view>
+    </picker>
+    <view class="box">
+      <view class="class-box">
+        <view class="class-tit flex flex-align-center">
+          <view class="label"></view>
+          <view class="class-name">{{showClassList[classIndex].className}}</view>
+          <view class="invitation-btn" catchtap="toInvitation" wx:if="{{showClassList[classIndex].teacherRole === 1}}" catchtap="toInvitationPop">邀请学生</view>
+        </view>
+        <view class="class-message">
+          <view class="msg flex flex-pack-justify flex-align-center">
+            <view class="msg-tit">教师角色</view>
+            <view class="msg-cont flex flex-align-center">{{roleArray[showClassList[classIndex].teacherRoleIndex].name}}</view>
+          </view>
+          <view class="msg flex flex-pack-justify flex-align-center">
+            <view class="msg-tit">任教科目</view>
+            <view class="msg-cont flex flex-align-center">{{subjectArray[showClassList[classIndex].subjectIndex].name}}</view>
+          </view>
+          <view class="msg flex flex-pack-justify flex-align-center">
+            <view class="msg-tit">进班方式</view>
+            <view class="msg-cont flex flex-align-center">{{entryModeArray[showClassList[classIndex].entryModeIndex].name}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="box">
+      <view class="class-box">
+        <view class="class-tit master-tit flex flex-align-center">
+          <view class="label"></view>
+          <view class="class-name">班级成员({{stuList.length}})</view>
+          <view class="examine-btn" catchtap="toMyExamine" wx:if="{{showClassList[classIndex].teacherRole === 1}}">{{applyCount}}人申请进班<text class="iconfont icon-right"></text></view>
+        </view>
+        <view class="stu-list mb-20">
+          <block wx:if="{{stuList.length > 0}}">
+            <view class="stu-item flex flex-align-center" wx:for="{{stuList}}" wx:for-index="idx" wx:key="{{item.userId}}">
+              <view class="stu-head-pic">
+                <image src="{{item.pic}}" wx:if="{{item.pic && item.pic !== '' && item.pic !== null}}"></image>
+                <image src="../../assets/images/avatar.png" wx:else></image>
+              </view>
+              <view class="stu-name">{{item.userName}}</view>
+            </view>
+          </block>
+          <block wx:else>
+            <is-null><text slot="tips">暂时还没有学生进班快邀请学生进班吧</text></is-null>
+          </block>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="pop-wrapper" wx:if="{{popVisible}}">
+    <view class="mask" catchtap="closePop"></view>
+    <view class="pop">
+      <view class="iconfont icon-plus modal-close" catchtap="closePop"></view>
+      <view class="pop-cont">
+        <view class="cont-box" bindtap="toInvitation">
+          <view class="tit">有班级微信群/联系方式</view>
+          <view class="cont">通过班级二维码邀请加入</view>
+        </view>
+        <view class="cont-box">
+          <view class="tit">复制短信内容邀请<text class="copy" bindtap='copyText'>(点击复制内容)</text></view>
+          <view class="cont">{{popCont}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+
+  <!--
+                <text class="iconfont icon-edit" catchtap="editStu" data-index="{{index}}"></text>
+                <text class="iconfont icon-delete" catchtap="removeStu" data-index="{{index}}"></text>
+  <modal visable="{{visable}}" bindmodaltoggle="toggleModal">
+    <text slot="header">温馨提示</text>
+    <view slot="body" class="modalFontColor">
+      是否确定将 {{stuList[removeUserIndex].userName}} 移除出 {{classList[current].className}}？
+    </view>
+    <view slot="footer" class="btn-group flex" >
+      <text class="btn btn-gray btn-plain btn-lg flex1" catchtap="toggleModal">取消</text>
+      <text class="btn btn-primary btn-lg flex1" catchtap="removeStuConfirm">确定</text>
+    </view>
+  </modal>
+
+  <modal visable="{{isShowEditModal}}" bindmodaltoggle="hidenEditModal">
+    <text slot="header">修改学生姓名</text>
+    <view slot="body" class="modalFontColor">
+      <input value="{{editData.studentName}}" type="text" placeholder="请填写学生姓名" bindinput="changeStuName" />
+    </view>
+    <view slot="footer" class="btn-group flex">
+      <text class="btn btn-gray btn-plain btn-lg flex1" catchtap="hidenEditModal">取消</text>
+      <text class="btn btn-primary btn-lg flex1" catchtap="submitEdit">保存</text>
+    </view>
+  </modal>-->
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import wechat from '@/until/wechat'
+  import {tinax} from '@/store'
+  Page.define({
+    mixins: [
+      tinax.connect({
+        getters (getters) {
+          return {
+            info: getters.getUserInfo(),
+            classList: getters.getClassList(),
+          };
+        }
+      }),
+    ],
+    data: {
+      classIndex: 0,
+      classArr: [],
+      roleArray: [{id: 1, name: '班主任'}, {id: 2, name: '任课老师'}],
+      subjectArray: [{id: 0, name: '全科'},{id: 1, name: '语文'},{id: 2, name: '数学'},{id: 3, name: '英语'},{id: 4, name: '体育'}],
+      entryModeArray: [{id: 0, name: '无需审核'},{id: 2, name: '需要审核'}],
+      applyCount: 0,
+      stuList: [],
+      popVisible: false,
+      popCont: '',
+
+      visable: false,
+      removeUserIndex:'',
+      current:0,
+      isShowEditModal:false,
+      editData:{
+        studentId:'',
+        studentName:''
+      }
+    },
+    onLoad() {
+
+    },
+    async onShow(){
+      let showClassList = this.data.classList
+      let classArr = []
+      showClassList.forEach((value) => {
+        const params = {
+          id: value.classId,
+          name: value.className
+        }
+        classArr.push(params)
+
+        if (value.teacherRole) {
+          value.teacherRoleIndex = value.teacherRole - 1
+        } else {
+          value.teacherRoleIndex = 0
+        }
+        if (value.subject) {
+          value.subjectIndex = value.subject
+        } else {
+          value.subjectIndex = 0
+        }
+        switch (value.entryMode) {
+          case 0:
+            value.entryModeIndex = 0
+            break
+          default:
+            value.entryModeIndex = 1
+        }
+      })
+      this.setData({
+        classArr: classArr,
+        showClassList: showClassList
+      })
+
+      // 获取该班的学生
+      await this.getClassStuList()
+    },
+    methods:{
+      toMyExamine () {
+        this.$router.navigate(`/pages/my/examine?id=${this.data.showClassList[this.data.classIndex].classId}&className=${this.data.showClassList[this.data.classIndex].className}`);
+      },
+      async getClassStuList(){
+        let classId = this.data.showClassList[this.data.classIndex].classId
+        let params = {
+          classId
+        }
+        let res = await this.$api.classroom.getStu(params);
+        if(res.rcode === 300){
+          this.setData({
+            applyCount: res.data.applyCount || 0,
+            stuList: res.data.stuList
+          })
+        }
+      },
+      bindPickerChange (e) {
+        let index = parseInt(e.detail.value)
+        this.setData({
+          classIndex: index
+        })
+
+        this.getClassStuList()
+      },
+      toInvitationPop (e) {
+        this.setData({
+          popVisible: true,
+          popCont: `为了更有效地进行家校沟通，${this.data.showClassList[this.data.classIndex].teacherName}老师邀请您进入${this.data.showClassList[this.data.classIndex].className}，打开微信搜索【语智通学生版】小程序，输入学校班级信息，即可加入班级。`
+        })
+      },
+      closePop () {
+        this.setData({
+          popVisible: false
+        })
+      },
+      toInvitation (e) {
+        let classId = this.data.showClassList[this.data.classIndex].classId
+        let className = this.data.showClassList[this.data.classIndex].className
+        this.$router.navigate(`/pages/my/invitation?id=${classId}&className=${className}`);
+      },
+      copyText () {
+        wx.setClipboardData({
+          data: this.data.popCont,
+          success (res) {
+            wx.showToast({
+              title: '复制成功'
+            })
+          }
+        })
+      },
+
+
+
+      toggleModal(e){
+        if(e && e.type && e.type==='modaltoggle'){
+          this.setData({
+            visable:e.detail
+          })
+        }else{
+          this.setData({
+            visable:!this.data.visable
+          })
+        }
+      },
+      //修改学生姓名
+      editStu(e){
+        let index=parseInt(e.currentTarget.dataset.index);
+        this.data.editData.studentId=this.data.stuList[index].userId;
+        this.data.editData.studentName=this.data.stuList[index].userName;
+        this.data.editData.index=index;
+        this.setData({
+          editData:this.data.editData,
+          isShowEditModal:true
+        })
+      },
+      // 隐藏学生编辑框
+      hidenEditModal(e){
+        this.setData({
+          isShowEditModal:false
+        })
+      },
+      // 学生姓名修改
+      changeStuName(e){
+        this.data.editData.studentName=e.detail.value;
+        this.setData({
+          editData:this.data.editData
+        })
+      },
+      // 提交修改
+      async submitEdit(){
+        let res=await this.$api.user.updateStudent(this.data.editData);
+        if(res && res.rcode===300){
+          debugger;
+          this.data.stuList[this.data.editData.index].userName=this.data.editData.studentName;
+          this.setData({
+            stuList:this.data.stuList,
+            isShowEditModal:false
+          })
+          this.$toast('修改成功');
+        }
+      },
+      async getClassList(){
+        return new Promise(async(resolve)=>{
+          let res=await this.$api.classroom.get();
+          if(res.rcode===300){
+            this.setData({
+              classList:res.data.classList
+            })
+            resolve();
+          }else{
+            resolve();
+          }
+        })
+      },
+
+      //删除学生
+      removeStu(e){
+        let index=parseInt(e.currentTarget.dataset.index);
+        this.setData({
+          removeUserIndex:index,
+          visable:true
+        })
+      },
+      //确认删除学生
+      async removeStuConfirm(){
+        let res= await this.$api.classroom.removeStu({
+          classId:this.data.classList[this.data.current].classId,
+          studentId:this.data.stuList[this.data.removeUserIndex].userId
+        });
+        if(res.rcode===300){
+          this.toggleModal();
+          this.$message.success('删除成功');
+        }
+      },
+
+    }
+
+  })
+</script>
+<style lang="scss" src="./manage.scss"></style>

@@ -1,0 +1,38 @@
+@import "~@/assets/style/base.scss";
+
+#work-scope{
+  border-top: 0;
+  padding-bottom: 160rpx;
+
+  .section-top{
+    border-bottom: 0;
+
+    .screen{
+      color: $mainColor;
+    }
+  }
+
+  .work-scope-list{
+    padding-top: 0;
+
+    .work-scope-item{
+      background: $mainColor;
+      color: #FFFFFF;
+      padding: 30rpx;
+      border-radius: 10rpx;
+      margin-bottom: 30rpx;
+      .cont{
+        .name{
+          font-size: 32rpx;
+          font-weight: bold;
+        }
+        .drsc{
+          margin-top: 10rpx;
+        }
+      }
+    }
+  }
+}
+
+
+

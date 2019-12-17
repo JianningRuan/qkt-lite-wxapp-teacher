@@ -1,0 +1,158 @@
+<config>
+  {
+    "navigationBarTitleText":"首页"
+  }
+</config>
+
+
+<template>
+  <view id="tabbar-home">
+    <view class="banner">
+      <swiper indicator-dots="true"
+              autoplay="true" interval="1500" duration="500">
+        <block wx:for="{{bannerList}}" wx:key="{{index}}">
+          <swiper-item catchtap="banngerNavgation" data-url="{{item.picUrl}}">
+            <image src="{{item.pic}}" class="slide-image" mode="widthFix"/>
+          </swiper-item>
+        </block>
+      </swiper>
+    </view>
+    <view class="top">
+      <view class="title">
+        <image src="../assets/images/home/zxdt.jpg"></image>
+      </view>
+      <view class="cont">
+        <block wx:if="{{news.length>0}}">
+          <view class="msg-item flex flex-align-center" wx:for="{{news}}" wx:key="{{index}}" catchtap="toNoticeDetail"
+                data-item="{{item}}">
+            <image src="../assets/images/home/vote.svg" wx:if="{{item.type==2}}"></image>
+            <image src="../assets/images/home/voice.svg" wx:else></image>
+            <view class="content flex1">{{item.title}}</view>
+            <view class="schedu" wx:if="{{item.type!=4}}">
+              {{item.type == 2 ? '已投票' : '已读'}}：{{item.type == 2 ? item.voteCount : item.readCount}}/{{item.stuCount}}
+            </view>
+          </view>
+        </block>
+        <block wx:else>
+          <view class="text-center modalFontColor">暂无动态消息</view>
+        </block>
+      </view>
+    </view>
+    <view class="function-list section">
+      <view class="section-top">
+        <span class="section-title">常用功能</span>
+      </view>
+      <view class="section-cont">
+        <view class="function-list-warp">
+          <view class="function-item" catchtap="toWorkPublish">
+            <image src="../assets/images/home/task.png"></image>
+            <view class="name">布置作业</view>
+          </view>
+          <view class="function-item" catchtap="toNoticePublish">
+            <image src="../assets/images/home/notice.png"></image>
+            <view class="name">发送通知</view>
+          </view>
+          <view class="function-item" catchtap="toVotePublish">
+            <image src="../assets/images/home/vote.png"></image>
+            <view class="name">创建投票</view>
+          </view>
+          <view class="function-item" catchtap="toClassManage">
+            <image src="../assets/images/home/class.png"></image>
+            <view class="name">管理班级</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <official-account binderror="bindWxError" bindload="bindload"></official-account>
+
+  <view class="feedback iconfont icon-kefu">
+    <button open-type="contact">进入客服会话</button>
+  </view>
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import wechat from '@/until/wechat'
+  import {tinax} from '@/store'
+  Page.define({
+    mixins: [
+      tinax.connect({
+        getters (getters) {
+          return {
+            info: getters.getUserInfo(),
+          };
+        }
+      }),
+    ],
+    data: {
+      news: [],
+      bannerList: [],
+    },
+    async onLoad() {
+      if (!this.data.info.isCheck) {
+        this.toMyCheck()
+      }
+    },
+    onShow() {
+      this.getNews();
+      this.getBanner();
+    },
+    methods: {
+      toMyCheck(){
+        this.$router.redirect(`/pages/my/check`);
+      },
+
+      toWorkPublish() {
+        this.$router.navigate(`/pages/work/type`);
+      },
+      toNoticePublish() {
+        this.$router.navigate(`/pages/notice/publish`);
+      },
+      toVotePublish() {
+        this.$router.navigate(`/pages/notice/publish?type=2`);
+      },
+      toClassManage() {
+        this.$router.navigate(`/pages/class/manage`);
+      },
+      toNoticeDetail(e) {
+        let item = e.currentTarget.dataset.item;
+        if (item.type != 4) {
+          this.$router.navigate(`/pages/notice/detail?id=${item.id}`);
+        } else {
+          this.$router.navigate(`/pages/work/info?id=${item.relevanceId}`);
+        }
+      },
+      async getNews() {
+        let res = await this.$api.until.getNews();
+        if (res.rcode === 300) {
+          this.setData({
+            news: res.data.noticeList
+          })
+        }
+      },
+      bindWxError(e) {
+        console.log(e);
+      },
+      async getBanner() {
+        let res = await this.$api.until.getBanner({type: 1});
+        if (res.rcode === 300) {
+          this.setData({
+            bannerList: res.data.bannerList
+          });
+        }
+      },
+      banngerNavgation(e) {
+        let url = e.currentTarget.dataset.url;
+        if (url && url != '') {
+          this.router.navigate(url);
+        }
+      },
+      bindload(e) {
+        console.log(e);
+      }
+    }
+
+  })
+</script>
+<style lang="scss" src="./home.scss"></style>

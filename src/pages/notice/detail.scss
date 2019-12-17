@@ -1,0 +1,98 @@
+@import "../../assets/style/base.scss";
+
+.notice-detail{
+  padding: 30rpx;
+  .notice-msg{
+    .top{
+      border-bottom: 1px solid #e5e5e5;
+      padding-bottom: 30rpx;
+
+      .base-msg{
+        image{
+          width: 26rpx;
+          height: 26rpx;
+          margin-right: 16rpx;
+        }
+        .name{
+          margin-right: 30rpx;
+          color: #333333;
+          font-weight: bold;
+        }
+        .time{
+          color: #e24027;
+          font-size: 24rpx;
+        }
+      }
+      .schedu{
+        margin-top: 15rpx;
+        .finish{
+          color: #999999;
+        }
+      }
+    }
+    .content{
+      margin-top: 30rpx;
+      color: #333333;
+      line-height:45rpx;
+    }
+  }
+
+  .notice-detail-show{
+    .tab{
+      border-bottom: 1px solid #e5e5e5;
+      padding-bottom: 30rpx;
+      margin-left: -30rpx;
+      margin-right: -30rpx;
+      .tab-item{
+        color: #999999;
+        text-align: center;
+        &.active{
+          color: #333333;
+          font-weight: bold;
+        }
+      }
+    }
+    .tab-cont{
+      .total{
+        margin-top: 30rpx;
+        border-bottom: 1px solid #e5e5e5;
+        padding-bottom: 30rpx;
+        .total-item{
+          border-radius: 10rpx;
+          color: #ffffff;
+          padding: 30rpx;
+          margin-bottom: 30rpx;
+          &:last-child{
+            margin-bottom: 0;
+          }
+
+          &:nth-child(2n){
+            background: $mainColor;
+          }
+          &:nth-child(2n-1){
+            background: #eab925;
+          }
+        }
+      }
+    }
+    .user-list{
+      margin-top: 30rpx;
+      .user-item{
+        padding: 15rpx 0;
+        .avatar{
+          @include avatar(72rpx);
+          margin-right: 25rpx;
+        }
+        .name{
+          color: #333333;
+        }
+        .value{
+          color: #999999;
+          &.red{
+            color: #e24027;
+          }
+        }
+      }
+    }
+  }
+}

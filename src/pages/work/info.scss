@@ -1,0 +1,188 @@
+@import "../../assets/style/base.scss";
+
+.work-info{
+  padding: 30rpx;
+  .work-info-chart{
+
+    .top{
+      padding-bottom: 30rpx;
+      border-bottom: 1px solid #f8c9ce;
+      .icon{
+        width: 50rpx;
+        height: 50rpx;
+        margin-right: 16rpx;
+      }
+      .name{
+        color: #333333;
+        font-weight: bold;
+        margin-right: 15rpx;
+        @extend .textOverflowEllipsis;
+      }
+      .finish{
+        color: #999999;
+      }
+      .more{
+        position: relative;
+        color: #dddddd;
+        display:inline-block;
+        width:50rpx;
+        height:50rpx;
+        line-height:50rpx;
+        text-align:center;
+      }
+    }
+    .cont{
+      margin-top: 30rpx;
+
+      &.hidden{
+        height: 200rpx;
+        overflow: hidden;
+      }
+      .work-item-task{
+        color: #666666;
+        &:last-child{
+          margin-bottom: 0;
+        }
+
+        .image-list{
+          margin-top: 16rpx;
+          .image-item{
+            width: calc((100% - (30rpx * 3)) / 4);
+            padding-bottom: calc((100% - (30rpx * 3)) / 4);
+            margin-right: 30rpx;
+            margin-bottom: 30rpx;
+            &:nth-child(4n){
+              margin-right: 0;
+            }
+          }
+        }
+      }
+
+    }
+    .toggle-btn{
+      color: #2bbcf1;
+    }
+  }
+  .section{
+    border-top: 0;
+    box-shadow: 0 0 10rpx rgba(102,102,102,0.15);
+    border-radius: 10rpx;
+    margin-bottom: 30rpx;
+    padding: 30rpx;
+    &:last-child{
+      margin-bottom: 0;
+    }
+    .section-top{
+      padding: 0;
+      padding-bottom: 30rpx;
+
+      .screen{
+        position: relative;
+        color: $mainColor;
+        .dropDownSelect{
+          margin-bottom:-260rpx;
+          .dropDownSelect-list{
+            .dropDownSelect-item{
+              text-align: center;
+              border-bottom: 0;
+              padding: 15px 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .work-info-unFiniseh{
+    .unFiniseh-list{
+      margin-top: 30rpx;
+      .unFiniseh-item{
+        display: inline-block;
+        width:calc((100% - (15rpx * 5)) / 6);
+        margin-right: 40rpx;
+        margin-bottom: 15rpx;
+        &:nth-child(6n){
+          margin-right: 0;
+        }
+        .avatar{
+          @include avatar(72rpx);
+        }
+        .name{
+          margin-top: 15rpx;
+          color: #999999;
+          font-size: 24rpx;
+          @extend .textOverflowEllipsis;
+        }
+      }
+      .more{
+        color: #40b3ff;
+        font-size: 24rpx;
+        text-align: center;
+      }
+    }
+  }
+
+  .common-user-list{
+    margin-top: 30rpx;
+    .common-user-item{
+      margin-bottom: 30rpx;
+      &:last-child{
+        margin-bottom: 0;
+      }
+      .no,.name{
+        font-size: 24rpx;
+        color: #999999;
+        margin-right: 20rpx;
+      }
+      .avatar{
+        @include avatar(72rpx);
+        margin-right: 20rpx;
+      }
+      .blue{
+        font-size: 24rpx;
+        color: #40b3ff;
+      }
+    }
+  }
+}
+
+.dropDownSelect{
+  position: absolute;
+  bottom: 0;
+  background: #FFFFFF;
+  box-shadow: 0 0 40rpx rgba(0, 0, 0, 0.2);
+  padding: 20rpx;
+  left: 50%;
+  margin-bottom: -200rpx;
+  margin-left: -185rpx;
+  border-radius: 10rpx;
+  z-index: 8;
+  &:after{
+    content: "";
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    border-left: 10rpx solid transparent;
+    border-right: 10rpx solid transparent;
+    border-bottom: 20rpx solid #FFFFFF;
+    margin-top: -20rpx;
+    margin-right: 20rpx;
+  }
+  .dropDownSelect-list{
+    .dropDownSelect-item{
+      width: 174rpx;
+      padding: 10rpx 0;
+      border-bottom: 1px solid #e5e5e5;
+      &:last-child{
+        border-bottom: 0;
+      }
+      .iconfont{
+        margin-right: 15rpx;
+        font-size: 28rpx;
+      }
+    }
+  }
+}

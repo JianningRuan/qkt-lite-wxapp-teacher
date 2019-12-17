@@ -1,0 +1,125 @@
+<config>
+{
+  "window": {
+    "navigationBarBackgroundColor": "#8bd1e7",
+    "backgroundColor": "#ffffff"
+  },
+  "pages": [
+    "pages/login.mina",                 //登录
+    "pages/my.mina",                    //我的
+    "pages/message.mina",               //消息
+    "pages/work.mina",                  //作业
+    "pages/home.mina",                  //首页
+  ],
+  "subPackages": [
+    {
+      "root": "pages/work",
+      "name": "work",
+      "pages": [
+        "scope.mina",            //选择口算题目范围
+        "type.mina",             //选择作业类型
+        "list.mina",             //作业列表
+        "detail.mina",           //作业详情
+        "info.mina",             //作业统计
+        "publish.mina",          //作业发布
+        "success.mina",          //作业发布成功
+      ]
+    },
+    {
+      "root": "pages/notice",
+      "name": "notice",
+      "pages": [
+        "my.mina",           //我发起的通知
+        "detail.mina",       //通知详情
+        "list.mina",         //通知列表
+        "success.mina",      //通知发布成功
+        "publish.mina",      //通知发布
+      ]
+    },
+    {
+      "root": "pages/my",
+      "name": "my",
+      "pages": [
+        "check.mina",           //我的-信息核对
+        "info.mina",           //我的-个人信息
+        "examine.mina",        //审核名单
+        "invitation.mina",     //二维码邀请
+      ]
+    },
+    {
+      "root": "pages/class",
+      "name": "class",
+      "pages": [
+        "manage.mina",           //班级管理
+      ]
+    },
+  ],
+  "tabBar": {
+    "color":"#999999",
+    "selectedColor":"#65c6e4",
+    "backgroundColor":"#ffffff",
+    "list": [{
+    "pagePath": "pages/home",
+    "text": "首页",
+    "iconPath": "./assets/images/tabbar/tabbar-index.png",
+    "selectedIconPath": "./assets/images/tabbar/tabbar-index-active.png"
+    }, {
+    "pagePath": "pages/work",
+    "text": "作业",
+    "iconPath": "./assets/images/tabbar/tabbar-work.png",
+    "selectedIconPath": "./assets/images/tabbar/tabbar-work-active.png"
+    }, {
+    "pagePath": "pages/message",
+    "text": "消息",
+    "iconPath": "./assets/images/tabbar/tabbar-message.png",
+    "selectedIconPath": "./assets/images/tabbar/tabbar-message-active.png"
+    },{
+    "pagePath": "pages/my",
+    "text": "我的",
+    "iconPath": "./assets/images/tabbar/tabbar-person.png",
+    "selectedIconPath": "./assets/images/tabbar/tabbar-person-active.png"
+    }]
+  },
+  "navigateToMiniProgramAppIdList": [
+    "wx494a50b5886a3691"
+  ]
+}
+</config>
+
+<script>
+  import Tina from '@tinajs/tina'
+  import router from '@tinajs/tina-router'
+  import modal from '@tinajs/tina-modal'
+  import message from '@/plugin/message'
+  import api from '@/plugin/api'
+  import fundebug from 'fundebug-wxjs';
+
+  fundebug.init(
+    {
+      apikey : '4f255cf0494b0d3a87a8227406035c2a21b94d7b3e5aceaee4c6433177aca866'
+    })
+
+  Tina.use(router).use(modal).use(message).use(api);
+//  Tina.prototype.api=api;
+App({
+  data:{
+
+  },
+  onLaunch() {
+    let updateManager=wx.getUpdateManager();
+    updateManager.onUpdateReady(function () {
+      wx.showModal({
+        title: '更新提示',
+        content: '新版本已经准备好，是否重启应用？',
+        success(res) {
+          if (res.confirm) {
+            // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+            updateManager.applyUpdate()
+          }
+        }
+      })
+    })
+  },
+})
+</script>
+<style lang="scss" src="./app.scss"></style>

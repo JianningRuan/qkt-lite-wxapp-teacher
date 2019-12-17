@@ -1,0 +1,215 @@
+<config>
+{
+  "navigationBarTitleText":"作业详情",
+  "usingComponents": {
+    "base-audio": "../../components/base-audio/base-audio.mina"
+  }
+}
+</config>
+
+<template>
+  <view id="work-detail" class="section-item flex flex-v">
+    <view class="user flex flex-align-center">
+      <text class="no"><block wx:if="{{index<9}}">0</block>{{index+1}}</text>
+      <view class="avatar">
+        <image src="{{work.stuHead}}" wx:if="{{work.stuHead && work.stuHead!=''}}"></image>
+        <image src="../../assets/images/avatar.png" wx:else></image>
+      </view>
+      <view class="name flex1">{{work.stuName}}</view>
+    </view>
+    <view class="wrok-detail-main {{IsShowToggle && isShowAll?'IsShowToggle':''}}">
+      <view class="work-detail-item" wx:for="{{work.homeworkItems}}">
+        <view class="work-name">{{index+1}}.{{item.title}}</view>
+        <view class="work-image-list image-list" wx:if="{{item.type==2}}">
+          <view class="image-item" wx:for="{{item.attachList}}" wx:for-item="img" wx:for-index="imgIndex" style="background-image: url('{{img.attachUrl}}')" catchtap="prevImg" data-imgs="{{item.attachList}}" data-index="imgIndex"></view>
+        </view>
+        <view class="work-audio-list audio-list" wx:elif="{{item.type==3}}">
+          <view class="audio-item" wx:for="{{item.attachList}}" wx:for-item="audio" wx:for-index="audioIndex">
+            <view class="control flex flex-align-center" catchtap="playSound" data-parentIndex="{{index}}" data-src="{{audio.attachUrl}}" data-index="{{audioIndex}}">
+              <view class="icon"><text class="iconfont  {{audio.isPlay?'icon-stop':'icon-play'}}"></text></view>
+              <image class="bg" src="~@/assets/images/work/audio-bg.png"></image>
+            </view>
+            <view class="time">
+              <text>{{audio.audioTime}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="more text-right" wx:if="{{IsShowToggle}}" catchtap="toggleIsShowAll">
+      {{isShowAll?'收起':'展开'}}<text class="iconfont  {{isShowAll?'icon-dingbu':'icon-dibu'}}"></text>
+    </view>
+    <view class="work-detail-comment flex1 flex flex-v">
+      <textarea placeholder="请输入作业评语" class="flex1" value="{{work.comment}}" maxlength="200" bindinput="commentChange"></textarea>
+      <view class="tips text-right">{{work.comment?work.comment.length:0}}/200</view>
+    </view>
+    <view class="operate">
+      <view class="btn btn-lg btn-block btn-primary" catchtap="submitComment">提交</view>
+    </view>
+  </view>
+  <base-audio src="{{src}}" bind:toPlay="toSoundPlay" bind:toStop="soundStop" bind:onEnded="soundStop" />
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina';
+  import wechat from '@/until/wechat';
+  const backgroundAudioManager = wx.getBackgroundAudioManager();
+  Page.define({
+    data: {
+      work:{},
+      index:'',
+      IsShowToggle:false,
+      isShowAll:false,
+      soundParentIndex:'',
+      soundIndex:'',
+      src:'',
+    },
+    async onLoad(){
+      if(this.$route.query.index){
+        this.setData({
+          index:parseInt(this.$route.query.index)
+        })
+      }
+      this.getStuWork(this.$route.query.id);
+    },
+    onShow(){
+      const query = wx.createSelectorQuery();
+      query.select('.wrok-detail-main').boundingClientRect();
+      query.exec((res)=>{
+        if(res[0] && res[0].height>300){
+          this.setData({
+            IsShowToggle:true
+          })
+        }
+      })
+    },
+    onHide() {
+      this.leavePage();
+    },
+    onUnload() {
+      this.leavePage();
+    },
+    methods:{
+      prevImg(e){
+        let index = e.currentTarget.dataset.index;
+        let imgs = e.currentTarget.dataset.imgs;
+        let imglist=[];
+        imgs.map(item=>{
+          imglist.push(item.attachUrl);
+        });
+        wx.previewImage({
+          current: imglist[index],
+          // 当前显示图片的http链接
+          urls: imglist // 需要预览的图片http链接列表
+        });
+      },
+      async getStuWork(id){
+        let res=await this.$api.work.getStuWork({homeworkRecordId:id});
+        res.data.homeworkItems.map((item)=>{
+          if(item.pics){
+            item.imgList=item.pics.split(',');
+          }else{
+            item.imgList=[];
+          }
+          if(item.type==3 && item.attachList && item.attachList.length>0){
+            item.attachList.map((audio)=>{
+              let min=Math.floor(audio.audioTime/60);
+              let seconds=audio.audioTime - (min*60);
+              if(min<10){
+                min='0'+min;
+              }
+              if(seconds<10){
+                seconds='0'+seconds;
+              }
+              audio.audioTime=`${min}:${seconds}`;
+            })
+          }
+        });
+        if(res.rcode==300){
+          this.setData({
+            work:res.data
+          })
+        }
+      },
+      commentChange(e){
+        this.data.work.comment=e.detail.value;
+        this.setData({
+          work:this.data.work
+        })
+      },
+      async submitComment(){
+        if(!this.data.work.comment ){
+          this.$toast('请先填写评语');
+          return false;
+        }
+        if(this.data.work.comment==''){
+          this.$toast('请先填写评语');
+          return false;
+        }
+        let res= await this.$api.work.check({homeworkRecordId:this.$route.query.id,comment:this.data.work.comment});
+        if(res.rcode==300){
+          this.$message.success('提交成功').then(()=>{
+            this.$router.back();
+          })
+        }
+      },
+      toggleIsShowAll(){
+        this.setData({
+          isShowAll:!this.data.isShowAll
+        })
+      },
+      toSoundPlay() {
+        this.data.work.homeworkItems[this.data.soundParentIndex].attachList[this.data.soundIndex].isPlay = true;
+        this.setData({
+          work: this.data.work
+        })
+      },
+      // 音频播放停止
+      soundStop() {
+        this.data.work.homeworkItems[this.data.soundParentIndex].attachList[this.data.soundIndex].isPlay = false;
+        this.setData({
+          work: this.data.work,
+          soundIndex: '',
+          soundParentIndex: '',
+          src: '',
+          transition:false
+        })
+      },
+      // 播放音频
+      playSound(e) {
+        let index = parseInt(e.currentTarget.dataset.index);
+        let parentIndex = parseInt(e.currentTarget.dataset.parentindex);
+        let src = e.currentTarget.dataset.src;
+        if (this.data.src === ''){
+          this.data.work.homeworkItems[parentIndex].attachList[index].isPlay = true;
+          this.setData({
+            work:this.data.work,
+            src: src,
+            soundIndex: index,
+            soundParentIndex: parentIndex
+          })
+        } else {
+          this.data.work.homeworkItems[parentIndex].attachList[index].isPlay = false;
+          this.setData({
+            work:this.data.work,
+            src: ''
+          })
+        }
+      },
+      //离开页面时的设置 退出页面或者后台
+      leavePage(){
+        if(this.data.soundParentIndex && this.data.soundParentIndex!='' && this.data.soundIndex && this.data.soundIndex!=''){
+          this.data.work.homeworkItems[this.data.soundParentIndex].attachList[this.data.soundIndex].isPlay = false;
+        }
+        this.setData({
+          work:this.data.work,
+          src: '',
+          soundIndex: '',
+          soundParentIndex: ''
+        })
+      }
+    }
+
+  })
+</script>
+<style lang="scss" src="./detail.scss"></style>

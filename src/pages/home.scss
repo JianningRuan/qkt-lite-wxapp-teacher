@@ -1,0 +1,99 @@
+@import "../assets/style/base.scss";
+
+#tabbar-home{
+  padding-bottom:170rpx;
+  .banner{
+    swiper{
+      height: 248rpx;
+    }
+    image{
+      width: 100%;
+      display: block;
+      height: 248rpx;
+    }
+  }
+  .top{
+    padding: 30rpx;
+    .title{
+      image{
+        width: 191rpx;
+        height: 45rpx;
+      }
+    }
+    .cont{
+      margin-top: 15rpx;
+      padding: 20rpx;
+      box-shadow: 0 0 10rpx rgba(102,102,102,0.15);
+      border-radius: 10rpx;
+      .msg-item{
+        margin-bottom: 20rpx;
+
+        &:last-child{
+          margin-bottom: 0;
+        }
+        image{
+          width: 35rpx;
+          height: 35rpx;
+          margin-right: 16rpx;
+          display: inline-block;
+          vertical-align: middle;
+        }
+        .content{
+          color: #333333;
+          margin-right: 15rpx;
+          @extend .textOverflowEllipsis;
+        }
+        .schedu{
+          color: #999999;
+          font-size: 24rpx;
+        }
+      }
+    }
+  }
+
+
+
+  .function-list{
+
+    .function-list-warp{
+      .function-item{
+        display: inline-block;
+        padding: 30rpx 0;
+        width: calc((100% - 15rpx) / 2);
+        margin-right: 10rpx;
+        margin-bottom: 10rpx;
+        border: 2rpx solid $mainColor;
+        text-align: center;
+        box-sizing: border-box;
+        border-radius: 10rpx;
+        &:nth-child(2n){
+          margin-right: 0;
+        }
+        &:nth-child(2),&:nth-child(3){
+          border-color: $secondColor;
+        }
+
+        image{
+          width: 80rpx;
+          height: 80rpx;
+        }
+
+        .name{
+          font-weight: bold;
+          font-size: 28rpx;
+        }
+
+      }
+    }
+  }
+}
+
+
+official-account{
+  position:fixed;
+  width:100%;
+  left:0;
+  bottom:0;
+  z-index:8;
+  border-top:1px solid #eee;
+}

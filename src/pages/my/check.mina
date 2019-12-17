@@ -1,0 +1,294 @@
+<config>
+{
+  "navigationBarTitleText":"信息校对",
+  "usingComponents": {
+    "modal": "../../components/modal/modal.mina",
+  }
+}
+</config>
+
+<template>
+  <view id="my-check">
+    <view class="check-box">
+      <view class="check-top">
+        <image src="../../assets/images/my/check-top2.jpg"></image>
+        <view class="check-top-cont">
+          <view class="school">{{info.schoolName}}</view>
+          <view class="tch">{{info.name}}老师<text>{{info.mobile}}</text></view>
+        </view>
+      </view>
+      <!--班级-->
+      <view class="class-box" wx:for="{{showClassList}}" wx:for-index="index" wx:key="{{index}}">
+        <view class="class-tit flex flex-align-center {{item.teacherRole === 1 ? 'master-tit' : ''}}">
+
+          <picker mode="multiSelector" bindchange="bindPickerClassChange" value="{{showClassList[index].classIndex}}" range="{{classArray}}" range-key="name" id="{{'c'+ index}}"> <!--disabled="{{item.teacherRole === 1 ? false : true}}"-->
+            <view class=" flex flex-align-center">
+              <view class="label"></view>
+              <view class="class-name">{{classArray[0][item.classIndex[0]].name}}{{classArray[1][item.classIndex[1]].name}}</view>
+              <view class="edit iconfont icon-edit1" data-id="{{index}}"></view>
+            </view>
+          </picker>
+          <view class="invitation-btn" data-index="{{index}}" catchtap="toInvitationPop" wx:if="{{item.teacherRole === 1}}">邀请学生</view>
+        </view>
+        <view class="class-message">
+          <picker bindchange="bindPickerRoleChange" value="{{showClassList[index].teacherRoleIndex}}" range="{{roleArray}}" range-key="name" id="{{index}}">
+            <view class="msg flex flex-pack-justify flex-align-center">
+              <view class="msg-tit">教师角色</view>
+              <view class="msg-cont flex flex-align-center">{{roleArray[showClassList[index].teacherRoleIndex].name}}<text class="right iconfont icon-right"></text></view>
+            </view>
+          </picker>
+          <picker bindchange="bindPickerSubjectChange" value="{{showClassList[index].subjectIndex}}" range="{{subjectArray}}" range-key="name" id="{{'s' + index}}">
+            <view class="msg flex flex-pack-justify flex-align-center">
+              <view class="msg-tit">任教科目</view>
+              <view class="msg-cont flex flex-align-center">{{subjectArray[showClassList[index].subjectIndex].name}}<text class="right iconfont icon-right"></text></view>
+            </view>
+          </picker>
+          <picker bindchange="bindPickerEntryModeChange" value="{{showClassList[index].entryModeIndex}}" range="{{entryModeArray}}" range-key="name" id="{{'e' + index}}" wx:if="{{item.teacherRole === 1}}">
+            <view class="msg flex flex-pack-justify flex-align-center">
+              <view class="msg-tit">进班方式</view>
+              <view class="msg-cont flex flex-align-center">{{entryModeArray[showClassList[index].entryModeIndex].name}}<text class="right iconfont icon-right"></text></view>
+            </view>
+          </picker>
+        </view>
+      </view>
+      <!--班级-end-->
+    </view>
+
+    <!-- <view class="top">
+      <image src="../../assets/images/my/check-top.jpg"></image>
+    </view>
+    <view class="my-check-main">
+      <view class="my-check-warp section">
+        <view class="section-top">
+          <span class="section-title">常用功能</span>
+        </view>
+        <view class="section-cont">
+          <view class="my-msg-list section-item">
+            <view class="my-msg-item flex flex-align-center">
+              <view class="key">学校</view>
+              <view class="value flex1">{{info.schoolName}}</view>
+            </view>
+            <view class="my-msg-item flex flex-align-center">
+              <view class="key">姓名</view>
+              <view class="value flex1">{{info.name}} 老师</view>
+            </view>
+            <view class="my-msg-item flex flex-align-center">
+              <view class="key">电话</view>
+              <view class="value flex1">{{info.mobile}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="my-check-warp section">
+        <view class="section-top">
+          <span class="section-title">带班信息</span>
+        </view>
+        <view class="section-cont">
+          <scroll-view scroll-x class="my-class-list">
+            <view class="my-class-item" wx:for="{{classList}}" wx:key="{{index}}">
+              <view class="header">{{item.className}}</view>
+              <view class="body">
+                <view class="my-class-msg-item flex flex-align-center">
+                  <view class="key">角色</view>
+                  <view class="value flex1">{{item.teacherRole==1?'班主任':item.teacherRole==2?'任课老师':''}}</view>
+                </view>
+                <view class="my-class-msg-item flex flex-align-center">
+                  <view class="key">科目</view>
+                  <view class="value flex1"><text wx:for="{{item.subjectList}}" wx:for-item="subject" wx:key="{{subject.id}}">{{subject.name}}</text></view>
+                </view>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+    </view> -->
+    <view class="operate">
+      <view class="btn btn-primary btn-block btn-lg" catchtap="checkMessage">进入语智通</view>
+      <view class="tips text-center">信息有误请联系客服 400-888-3322</view>
+    </view>
+  </view>
+
+  <view class="pop-wrapper" wx:if="{{popVisible}}">
+    <view class="mask"></view>
+    <view class="pop">
+      <view class="iconfont icon-plus modal-close" catchtap="closePop"></view>
+      <view class="pop-cont">
+        <view class="cont-box" bindtap="toInvitation">
+          <view class="tit">有班级微信群/联系方式</view>
+          <view class="cont">通过班级二维码邀请加入</view>
+        </view>
+        <view class="cont-box">
+          <view class="tit">复制短信内容邀请<text class="copy" bindtap='copyText'>(点击复制内容)</text></view>
+          <view class="cont">{{popCont}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import wechat from '@/until/wechat'
+  Page.define({
+    mixins: [
+      tinax.connect({
+        getters (getters) {
+          return {
+            info: getters.getUserInfo(),
+            classList: getters.getClassList(),
+          };
+        }
+      }),
+    ],
+    data: {
+      showClassList: [],
+      // gradeList: [{ id: 1, name: '一年级' }, { id: 2, name: '二年级' }, { id: 3, name: '三年级' }, { id: 4, name: '四年级' }, { id: 5, name: '五年级' }, { id: 6, name: '六年级' }],
+      // classNoList: [{ id: 1, name: '1班' }, { id: 2, name: '2班' }, { id: 3, name: '3班' }, { id: 4, name: '4班' }, { id: 5, name: '5班' }, { id: 6, name: '6班' }, { id: 7, name: '7班' }, { id: 8, name: '8班' }, { id: 9, name: '9班' }, { id: 10, name: '10班' }, { id: 11, name: '11班' }, { id: 12, name: '12班' }, { id: 13, name: '13班' }, { id: 14, name: '14班' }, { id: 15, name: '15班' }, { id: 16, name: '16班' }, { id: 17, name: '17班' }, { id: 18, name: '18班' }, { id: 19, name: '19班' }, { id: 20, name: '20班' }],
+      classArray: [
+        [{ id: 1, name: '一年级' }, { id: 2, name: '二年级' }, { id: 3, name: '三年级' }, { id: 4, name: '四年级' }, { id: 5, name: '五年级' }, { id: 6, name: '六年级' }],
+        [{ id: 1, name: '1班' }, { id: 2, name: '2班' }, { id: 3, name: '3班' }, { id: 4, name: '4班' }, { id: 5, name: '5班' }, { id: 6, name: '6班' }, { id: 7, name: '7班' }, { id: 8, name: '8班' }, { id: 9, name: '9班' }, { id: 10, name: '10班' }, { id: 11, name: '11班' }, { id: 12, name: '12班' }, { id: 13, name: '13班' }, { id: 14, name: '14班' }, { id: 15, name: '15班' }, { id: 16, name: '16班' }, { id: 17, name: '17班' }, { id: 18, name: '18班' }, { id: 19, name: '19班' }, { id: 20, name: '20班' }]
+      ],
+      roleArray: [{id: 1, name: '班主任'}, {id: 2, name: '任课老师'}],
+      subjectArray: [{id: 0, name: '全科'},{id: 1, name: '语文'},{id: 2, name: '数学'},{id: 3, name: '英语'},{id: 4, name: '体育'}],
+      entryModeArray: [{id: 0, name: '无需审核'},{id: 2, name: '需要审核'}],
+      inputIndex: 0,
+      popVisible: false,
+      popCont: '',
+      invitationClassIndex: 0,
+    },
+    async onLoad(){
+      let showClassList = this.data.classList
+      showClassList.forEach((value) => {
+        if (value.teacherRole) {
+          value.teacherRoleIndex = value.teacherRole - 1
+        } else {
+          value.teacherRoleIndex = 0
+        }
+        if (value.subject) {
+          value.subjectIndex = value.subject
+        } else {
+          value.subjectIndex = 0
+        }
+        switch (value.entryMode) {
+          case 0:
+            value.entryModeIndex = 0
+                break
+          default:
+            value.entryModeIndex = 1
+        }
+        let arr = []
+        if (value.grade) {
+          arr.push(value.grade - 1)
+        } else {
+          arr.push(0)
+        }
+        if (value.classNo) {
+          arr.push(value.classNo - 1)
+        } else {
+          arr.push(0)
+        }
+        value.classIndex = arr
+      })
+      this.setData({
+        showClassList: showClassList
+      })
+    },
+    methods:{
+      toInvitationPop (e) {
+        let index = parseInt(e.currentTarget.dataset.index)
+        this.setData({
+          invitationClassIndex: index,
+          popVisible: true,
+          popCont: `为了更有效地进行家校沟通，${this.data.showClassList[index].teacherName}老师邀请您进入${this.data.showClassList[index].className}，打开微信搜索【语智通学生版】小程序，输入学校班级信息，即可加入班级。`
+        })
+      },
+      closePop () {
+        this.setData({
+          popVisible: false
+        })
+      },
+      toInvitation (e) {
+        let classId = this.data.showClassList[this.data.invitationClassIndex].classId
+        let className = this.data.classArray[0][this.data.showClassList[this.data.invitationClassIndex].classIndex[0]].name + this.data.classArray[1][this.data.showClassList[this.data.invitationClassIndex].classIndex[1]].name
+        this.$router.navigate(`/pages/my/invitation?id=${classId}&className=${className}`);
+      },
+      copyText () {
+        wx.setClipboardData({
+          data: this.data.popCont,
+          success (res) {
+            wx.showToast({
+              title: '复制成功'
+            })
+          }
+        })
+      },
+      bindPickerRoleChange (e) {
+        let pickerIndex = parseInt(e.target.id)
+        let changeIndex = parseInt(e.detail.value)
+        let id = this.data.roleArray[changeIndex].id
+        this.data.showClassList[pickerIndex].teacherRole = id
+        this.data.showClassList[pickerIndex].teacherRoleIndex = changeIndex
+        this.setData({
+          showClassList: this.data.showClassList
+        })
+      },
+      bindPickerSubjectChange (e) {
+        let elementId = e.target.id.slice(1, 2)
+        let pickerIndex = parseInt(elementId)
+        let changeIndex = parseInt(e.detail.value)
+        let id = this.data.subjectArray[changeIndex].id
+        this.data.showClassList[pickerIndex].subject = id
+        this.data.showClassList[pickerIndex].subjectIndex = changeIndex
+        this.setData({
+          showClassList: this.data.showClassList
+        })
+      },
+      bindPickerEntryModeChange (e) {
+        let elementId = e.target.id.slice(1, 2)
+        let pickerIndex = parseInt(elementId)
+        let changeIndex = parseInt(e.detail.value)
+        let id = this.data.entryModeArray[changeIndex].id
+        this.data.showClassList[pickerIndex].entryMode = id
+        this.data.showClassList[pickerIndex].entryModeIndex = changeIndex
+        this.setData({
+          showClassList: this.data.showClassList
+        })
+      },
+      bindPickerClassChange (e) {
+        console.log(e)
+        let elementId = e.target.id.slice(1, 2)
+        let pickerIndex = parseInt(elementId)
+        let valueArr = e.detail.value
+        this.data.showClassList[pickerIndex].classIndex = valueArr
+        this.data.showClassList[pickerIndex].grade = this.data.classArray[0][valueArr[0]].id
+        this.data.showClassList[pickerIndex].classNo = this.data.classArray[1][valueArr[1]].id
+        this.setData({
+          showClassList: this.data.showClassList
+        })
+      },
+      bindKeyInput (e) {
+        this.data.showClassList[this.data.inputIndex].className = e.detail.value
+        this.setData({
+          showClassList: this.data.showClassList
+        })
+      },
+
+
+      async checkMessage(){
+        let params = {
+          classList: this.data.showClassList
+        }
+        let res=await this.$api.user.check(params);
+        if(res.rcode===300){
+          this.$message.success('核对成功').then((res)=>{
+            wx.removeStorageSync('accessToken');
+            this.$router.redirect('/pages/login');
+          })
+        }
+      }
+    }
+
+  })
+</script>
+<style lang="scss" src="./check.scss"></style>

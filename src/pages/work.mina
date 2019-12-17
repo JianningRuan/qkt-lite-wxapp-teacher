@@ -1,0 +1,173 @@
+<config>
+{
+  "navigationBarTitleText":"作业",
+  "usingComponents": {
+    "is-null": "../components/is-null/is-null.mina",
+  }
+}
+</config>
+
+
+
+<template>
+  <view id="tabbar-work">
+    <view class="top">
+      <image class="bg" mode="widthFix" src="../assets/images/work/top.png"></image>
+      <view class="date">{{today}}</view>
+      <view class="tab">
+        <text class="tab-item {{index==classIndex?'active':''}}" wx:for="{{classList}}" catchtap="changeClass" data-id="{{item.classId}}" data-index="{{index}}" wx:key="{{index}}">{{item.className}}</text>
+      </view>
+    </view>
+    <view class="today-work section">
+      <view class="section-top flex flex-align-center">
+        <text class="section-title flex1">作业列表</text>
+        <view class="section-more" catchtap="toWorkList">全部作业<text class="iconfont icon-right"></text></view>
+      </view>
+      <view class="section-cont">
+        <view class="work-list">
+          <block wx:if="{{works.length>0}}">
+            <view class="work-item" wx:for="{{works}}" wx:key="{{item.id}}" catchtap="toWorkInfo" data-id="{{item.id}}">
+              <view class="work-item-top flex flex-align-center" >
+                <image class="icon" wx:if="{{item.subjectId === 1}}" src="~@/assets/images/work/cn-icon.png"></image>
+                <image class="icon" wx:elif="{{item.subjectId === 2}}" src="~@/assets/images/work/math-icon.png"></image>
+                <image class="icon" wx:else src="~@/assets/images/work/en-icon.png"></image>
+                <view class="name flex1">{{item.title}}</view>
+                <view class="finish">完成：{{item.fStuTotal}}/{{item.fStuTotal+item.ufStuTotal}}</view>
+              </view>
+              <view class="work-item-bottom">
+                <view class="work-item-task" wx:for="{{item.homeworkItems}}" wx:for-item="task" wx:for-index="taskIndex" wx:key="{{taskIndex}}">
+                  <block wx:if="{{task.type==4}}">
+                    {{task.execTimeTotal}}分钟口算作业，达标分数{{task.execScore}}分
+                  </block>
+                  <block wx:else>
+                    {{taskIndex+1}}.{{task.content}}
+                  </block>
+                </view>
+              </view>
+            </view>
+            <view class="tips" catchtap="toWorkList">查看更多作业></view>
+          </block>
+          <block wx:else>
+            <is-null><text slot="tips">{{classList[classIndex].className}} 今天 暂无布置作业</text> </is-null>
+          </block>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import dayjs from 'dayjs'
+  import { tinax } from '@/store'
+  Page.define({
+    mixins: [
+      tinax.connect({
+        getters (getters) {
+          return {
+            works: getters.getList(),
+          }
+        },
+        actions ({setList}) {
+          return {
+            setList,
+          }
+        },
+      }),
+    ],
+    data: {
+      params: {
+        classId:'',
+        date:dayjs().format('YYYY-MM-DD'),
+        page:1,
+        pageSize:20,
+        subjectId:0
+      },
+      classIndex:0,
+      classList:[]
+    },
+    compute ({ params }) {
+      let day=dayjs(params.date).day();
+      let dayCn='';
+      switch(day)
+      {
+        case 1:
+          dayCn='一';
+          break;
+        case 2:
+          dayCn='二';
+          break;
+        case 3:
+          dayCn='三';
+          break;
+        case 4:
+          dayCn='四';
+          break;
+        case 5:
+          dayCn='五';
+          break;
+        case 6:
+          dayCn='六';
+          break;
+        default:
+          dayCn='日'
+      }
+      return {
+        today: dayjs(params.date).format('MM月DD日')+' 星期'+dayCn,
+      }
+    },
+    async onLoad(){
+
+    },
+    async onShow(){
+      await this.getClassList();
+      this.getWorkList();
+    },
+    methods:{
+      async getClassList(){
+        return new Promise(async(resolve)=>{
+          let res=await this.$api.classroom.get();
+          if(res.rcode==300){
+            this.setData({
+              classList:res.data.classList,
+            })
+            resolve();
+          }else{
+            resolve();
+          }
+        })
+      },
+      async getWorkList(){
+        this.data.params.classId=this.data.classList[this.data.classIndex].classId;
+        if(this.data.classList[this.data.classIndex].teacherRole==1){
+          this.data.params.subjectId=0;
+        }else{
+          this.data.params.subjectId=this.data.classList[this.data.classIndex].subject;
+        }
+        let res=await this.$api.work.get(this.data.params);
+        if(res.rcode==300){
+          this.setList({list:res.data.list})
+        }
+      },
+      changeClass(e){
+        let index=parseInt(e.currentTarget.dataset.index);
+        if(this.data.classIndex!=index){
+          this.setData({
+            classIndex:index
+          })
+          this.getWorkList();
+        }
+      },
+      toWorkInfo(e){
+        let id=e.currentTarget.dataset.id;
+        this.$router.navigate(`/pages/work/info?id=${id}`);
+      },
+      toWorkList(){
+        this.$router.navigate(`/pages/work/list?classId=${this.data.params.classId}&subjectId=${this.data.params.subjectId}`);
+      }
+    }
+
+
+  })
+</script>
+<style lang="scss" src="./work.scss"></style>

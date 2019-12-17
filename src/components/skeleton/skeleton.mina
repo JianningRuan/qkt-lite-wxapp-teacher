@@ -1,0 +1,113 @@
+<config>
+{
+  "component": true
+}
+</config>
+
+<template>
+  <!--<canvas canvas-id="skeleton" disable-scroll="true"></canvas>-->
+  <view style="width: {{systemInfo.width}}px; height: {{systemInfo.height}}px; background-color: {{bgcolor}}; position: absolute; left:0; top:0; z-index:9998; overflow: hidden;">
+
+    <view wx:for="{{skeletonRectLists}}" wx:key="{{index}}" class="{{loading == 'chiaroscuro' ? 'chiaroscuro' : ''}}" style="width: {{item.width}}px; height: {{item.height}}px; background-color: rgb(194, 207, 214); position: absolute; left: {{item.left}}px; top: {{item.top}}px">
+
+    </view>
+    <view wx:for="{{skeletonCircleLists}}" wx:key="{{index}}" class="{{loading == 'chiaroscuro' ? 'chiaroscuro' : ''}}" style="width: {{item.width}}px; height: {{item.height}}px; background-color: rgb(194, 207, 214); border-radius: {{item.width}}px; position: absolute; left: {{item.left}}px; top: {{item.top}}px">
+
+    </view>
+
+    <view class="spinbox" wx:if="{{loading == 'spin'}}">
+      <view class="spin"></view>
+
+    </view>
+
+
+  </view>
+</template>
+
+<script>
+Component({
+  options: {
+    multipleSlots: true // 在组件定义时的选项中启用多slot支持
+  },
+  properties: {
+    bgcolor: {
+      type: String,
+      value: '#FFF'
+    },
+    selector: {
+      type: String,
+      value: 'skeleton'
+    },
+    loading: {
+      type: String,
+      value: 'spin'
+    }
+  },
+  data: {
+    loadingAni: ['spin', 'chiaroscuro'],
+    systemInfo: {},
+    skeletonRectLists: [],
+    skeletonCircleLists: []
+  },
+  attached: function () {
+    //默认的首屏宽高，防止内容闪现
+    const systemInfo = wx.getSystemInfoSync();
+    this.setData({
+      systemInfo: {
+        width: systemInfo.windowWidth,
+        height: systemInfo.windowHeight
+      },
+      loading: this.data.loadingAni.includes(this.data.loading) ? this.data.loading : 'spin'
+    })
+
+
+
+  },
+  ready: function () {
+    const that = this;
+
+    //绘制背景
+    wx.createSelectorQuery().selectAll(`.${this.data.selector}`).boundingClientRect().exec(function(res){
+      that.setData({
+        'systemInfo.height': res[0][0].height + res[0][0].top
+      })
+    });
+
+    //绘制矩形
+    this.rectHandle();
+
+    //绘制圆形
+    this.radiusHandle();
+
+  },
+  methods: {
+    rectHandle: function () {
+      const that = this;
+
+      //绘制不带样式的节点
+      wx.createSelectorQuery().selectAll(`.${this.data.selector} >>> .${this.data.selector}-rect`).boundingClientRect().exec(function(res){
+        that.setData({
+          skeletonRectLists: res[0]
+        })
+
+        console.log(that.data);
+      });
+
+    },
+    radiusHandle: function () {
+      const that = this;
+
+      wx.createSelectorQuery().selectAll(`.${this.data.selector} >>> .${this.data.selector}-radius`).boundingClientRect().exec(function(res){
+        console.log(res);
+        that.setData({
+          skeletonCircleLists: res[0]
+        })
+
+        console.log(that.data);
+      });
+    },
+
+  }
+})
+</script>
+<style lang="scss" src="./skeleton.scss"></style>

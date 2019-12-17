@@ -1,0 +1,67 @@
+@import "~@/assets/style/base.scss";
+
+
+#work-type{
+  border-top: 0;
+  .section-top{
+    border-bottom: 0;
+  }
+  .section-cont{
+    .work-type-list{
+      .work-type-item{
+        padding: 40rpx;
+        border-radius: 10rpx;
+        background: #ff9966;
+        color: #FFFFFF;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 30rpx;
+
+        &:nth-child(2n){
+          background: $mainColor;
+        }
+        .work-type-item-title{
+          font-size: 32rpx;
+          font-weight: bold;
+        }
+        .work-type-item-cont{
+          margin-top: 30rpx;
+          .iconfont{
+            margin-left: 10rpx;
+          }
+        }
+        .bg{
+          width: 119rpx;
+          height: 124rpx;
+          position: absolute;
+          right: 0;
+          bottom: 0;
+          margin-right: 65rpx;
+          margin-bottom: -10rpx;
+        }
+      }
+
+
+    }
+    .more{
+      background: #f8f8f8;
+      color: #999999;
+      font-weight: bold;
+      text-align: center;
+      line-height: 88rpx;
+      border-radius: 10rpx;
+    }
+  }
+}
+
+
+.kousuan-drsc{
+  color: #999999;
+  view{
+    &:first-child{
+      margin-bottom: 30rpx;
+    }
+  }
+}
+
+

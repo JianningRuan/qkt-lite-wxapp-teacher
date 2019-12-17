@@ -1,0 +1,591 @@
+<config>
+{
+  "navigationBarTitleText":"布置作业",
+  "usingComponents": {
+    "modal": "../../components/modal/modal.mina"
+  }
+}
+</config>
+
+
+
+<template>
+  <view class="common-tab flex flex-align-center">
+    <text class="flex1 {{selectedClassIndex===index?'active':''}}" wx:for="{{classList}}" wx:key="{{index}}" data-index="{{index}}" catchtap="changeActiveClassIndex">{{item.className}}</text>
+  </view>
+  <view class="notice-publish work-publish">
+    <view class="set-title flex flex-align-center">
+      <view class="input flex1"><input type="text" value="{{params.title}}" placeholder="请输入标题" bindinput="titleChange" /></view>
+      <text class="iconfont icon-close" catchtap="cleatTitle" wx:if="{{params.title!==''}}"></text>
+    </view>
+
+    <!--正常作业显示内容-->
+    <block wx:if="{{params.homeworkItems[0].type!=4}}">
+      <block wx:for="{{params.homeworkItems}}" wx:key="{{index}}">
+        <view class="section-item">
+          <view class="section-item-top flex flex-align-center">
+            <text class="title flex1">作业{{index+1}}</text>
+            <text class="red" wx:if="{{params.homeworkItems.length>1}}" catchtap="removeWorkItem" data-index="{{index}}">删除作业</text>
+          </view>
+          <view class="section-item-cont">
+            <view class="work-publish-item" >
+              <view class="input">
+                <input type="text" placeholder="请输入作业内容"  value="{{item.content}}" bindinput="workItemContChange" data-index="{{index}}" />
+              </view>
+
+              <view class="middle flex flex-align-center">
+                <view class="addAttch" catchtap="toggleIsShowAddAttch" data-index="{{index}}">{{item.isShowAddAttch?'隐藏':'添加'}}附件</view>
+                <view class="option-list flex1 text-right">
+                  <view class="option-item" catchtap="changeType" data-type="1" data-index="{{index}}">
+                    <view class="option-item-icon iconfont {{item.type==1?'icon-selected':'icon-select'}}"></view>
+                    <view class="option-item-name">打卡上交</view>
+                  </view>
+                  <view class="option-item" catchtap="changeType" data-type="2" data-index="{{index}}">
+                    <view class="option-item-icon iconfont {{item.type==2?'icon-selected':'icon-select'}}"></view>
+                    <view class="option-item-name">拍照上交</view>
+                  </view>
+                  <view class="option-item" catchtap="changeType" data-type="3" data-index="{{index}}">
+                    <view class="option-item-icon iconfont {{item.type==3?'icon-selected':'icon-select'}}"></view>
+                    <view class="option-item-name">语音上交</view>
+                  </view>
+                </view>
+              </view>
+              <view class="attchment" wx:if="{{item.isShowAddAttch}}">
+                <view class="image-list" >
+                  <view class="image-item" wx:for="{{item.attachment}}" wx:for-item="img" wx:for-index="imgIndex" wx:key="{{imgIndex}}"  style="background-image: url('{{img}}')" catchtap="prevImg" data-imgs="{{item.attachment}}" data-index="{{imgIndex}}" >
+                    <text class="delete iconfont icon-close" catchtap="deleteImage" data-firstindex="{{index}}" data-index="{{imgIndex}}"></text>
+                  </view>
+                  <view class="image-item" catchtap="chooseImage" data-index="{{index}}" wx:if="{{item.attachment.length<3}}">
+                    <text class="add iconfont icon-plus"></text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+      <view class="add-tips text-center" catchtap="addWorkItem"> <text class="iconfont icon-jia"></text>添加作业{{params.homeworkItems.length+1}}</view>
+    </block>
+
+    <!--口算作业显示内容-->
+    <block wx:else>
+      <!--口算作业选择题目-->
+      <view class="section-item">
+        <view class="select-issue">
+          <view class="content">
+            <block wx:for="{{scope}}" wx:key="{{index}}">
+              {{item.title}}<text wx:if="{{index!=scope.length-1}}">,</text>
+            </block>
+          </view>
+          <view class="text-right">
+            <text class="operate" catchtap="toChooseIssue">选择题目</text>
+          </view>
+        </view>
+      </view>
+
+      <!--口算达标设置-->
+
+      <picker
+        mode="multiSelector"
+        bindchange="bindPassPickerChange"
+        value="{{passPickerIndex}}"
+        range="{{passPicker}}"
+        range-key="name"
+        class="section-item"
+      >
+        <view class="compute-pass flex flex-align-center">
+          <text class="key flex1 text-left">达标要求</text>
+          <text class="value">{{passPicker[0][passPickerIndex[0]].name}},{{passPicker[1][passPickerIndex[1]].name}}</text>
+
+        </view>
+      </picker>
+    </block>
+
+
+
+
+
+
+
+
+
+
+
+  </view>
+
+  <view  class="notice-publish  work-publish select-section">
+    <view class="section-item">
+      <view class="other-msg-list">
+        <picker mode="date" value="{{enddate}}" start="{{startDate}}" bindchange="bindDateChange">
+          <view class="other-msg-item flex flex-align-center">
+            <text class="label flex1">截止日期</text>
+            <view class="datetime">
+              <view class="picker">
+                {{enddateformat}}
+              </view>
+
+            </view>
+            <view class="iconfont icon-right"></view>
+          </view>
+        </picker>
+        <picker mode="time" value="{{endtime}}" start="{{startTime}}"  bindchange="bindTimeChange">
+          <view class="other-msg-item flex flex-align-center">
+            <text class="label flex1">截止时间</text>
+            <view class="datetime">
+              <view class="picker">
+                {{endtime}}
+              </view>
+            </view>
+            <view class="iconfont icon-right"></view>
+          </view>
+        </picker>
+        <picker  value="{{currentSubjectIndex}}"   bindchange="changeSubject" range="{{classList[selectedClassIndex].subjectList}}" range-key="name" wx:if="{{params.homeworkItems[0].type!=4}}">
+          <view class="other-msg-item flex flex-align-center">
+            <text class="label flex1">作业学科</text>
+            <view class="datetime">
+              <view class="picker">
+                {{classList[selectedClassIndex].subjectList[currentSubjectIndex].name}}
+              </view>
+            </view>
+            <view class="iconfont icon-right"></view>
+          </view>
+        </picker>
+      </view>
+    </view>
+  </view>
+
+  <view class="submit-btn">
+    <view class="btn btn-primary btn-lg btn-block btn-plain" catchtap="prewTogggle" wx:if="{{params.homeworkItems[0].type==4 && scope.length>0}}">题目预览</view>
+    <view class="btn btn-primary btn-lg btn-block" catchtap="submit">确认布置</view>
+  </view>
+
+
+  <!--口算题目预览-->
+  <modal visable="{{isShowPrew}}" bindmodaltoggle="prewTogggle">
+    <text slot="header">口算题目预览</text>
+    <view slot="body">
+      <scroll-view scroll-y class="calc-prew-list">
+        <view class="calc-prew-item" wx:for="{{issueList}}" wx:key="{{index}}">
+          {{item.content}}
+        </view>
+      </scroll-view>
+    </view>
+    <view slot="footer" class="btn btn-primary btn-lg btn-block " catchtap="prewTogggle">
+      知道了
+    </view>
+  </modal>
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import wechat from '@/until/wechat'
+  import dayjs from 'dayjs'
+  import {tinax} from '@/store'
+  Page.define({
+    mixins: [
+      tinax.connect({
+        getters (getters) {
+          return {
+            scope: getters.getSelectScope(),
+            classList:getters.getClassList()
+          };
+        },
+        actions ({ClearSelectScope}) {
+          return {
+            ClearSelectScope,
+          }
+        },
+      }),
+    ],
+    data: {
+      imagesBase64List:[],
+      params:{
+        title:'',
+        homeworkItems:[{
+          content:'',
+          type:1,
+          attachment:[]
+        }]
+      },
+      enddate:dayjs(new Date()).add(1, 'day').format('YYYY-MM-DD'),
+      endtime:dayjs(new Date()).format('HH:mm'),
+      startDate:dayjs(new Date()).format('YYYY-MM-DD'),
+      startTime:'',
+      selectedClassIndex:0,
+      passPicker:[],
+      passPickerIndex:[1,10],
+      isShowPrew:false,//题目预览
+      issueList:[],//预览题目列表
+      currentSubjectIndex:0,//当前科目
+    },
+    compute ({ enddate }) {
+      return {
+        enddateformat: dayjs(enddate).format('YYYY年MM月DD日'),
+      }
+    },
+    async onLoad(){
+      await this.initData();
+      let typeId=this.$route.query.typeId;
+      if(typeId){
+        if(parseInt(typeId)===4){
+          //设置口算分钟picker列表值
+          this.setComputeMinList();
+        }
+        this.data.params.homeworkItems[0].type=parseInt(typeId);
+        this.setData({
+          params:this.data.params
+        });
+      }
+      if(this.$route.query.id){
+        this.getWorkInfo(this.$route.query.id);
+      }else{
+        this.changeTitle();
+      }
+
+
+
+    },
+    async onShow(){
+
+    },
+    methods:{
+      // 更改当前班级
+      changeActiveClassIndex(e){
+        let index=parseInt(e.currentTarget.dataset.index);
+        if(this.selectedClassIndex!==index){
+          this.setData({
+            selectedClassIndex:index,
+            params:this.data.params
+          });
+          this.changeTitle();
+        }
+      },
+      // 更改当前科目
+      changeSubject(e){
+        this.currentSubjectIndex=e.detail.value;
+      },
+      //清楚标题
+      cleatTitle(){
+        this.data.params.title='';
+        this.setData({
+          params:this.data.params
+        });
+      },
+      //切换显示上传附件
+      toggleIsShowAddAttch(e){
+        let index=parseInt(e.currentTarget.dataset.index);
+        if(this.data.params.homeworkItems[index].isShowAddAttch){
+          this.data.params.homeworkItems[index].isShowAddAttch=false;
+        }else{
+          this.data.params.homeworkItems[index].isShowAddAttch=true;
+        }
+        this.setData({
+          params:this.data.params
+        })
+      },
+      async chooseImage(e){
+        let index=e.currentTarget.dataset.index;
+        let count=3-this.data.params.homeworkItems[index].attachment.length;
+        let res = await wechat.chooseImage(count);
+        wx.showLoading({
+          title: '加载中',
+          mask:true
+        });
+        let uploadRes= await wechat.upload(res,1,'work');
+        wx.hideLoading();
+        this.data.params.homeworkItems[index].attachment.push(...uploadRes);
+        this.setData({
+          params:this.data.params
+        })
+      },
+      prevImg(e){
+        let index=e.currentTarget.dataset.index;
+        let imgs=e.currentTarget.dataset.imgs;
+        wx.previewImage({
+          current: imgs[index], // 当前显示图片的http链接
+          urls: imgs // 需要预览的图片http链接列表
+        });
+      },
+      deleteImage(e){
+        let fitstIndex=e.currentTarget.dataset.firstindex;
+        let index=e.currentTarget.dataset.index;
+        wechat.deleteCosImages([this.data.params.homeworkItems[fitstIndex].attachment[index]]);
+        this.data.params.homeworkItems[fitstIndex].attachment.splice(index,1);
+        this.setData({
+          params:this.data.params
+        });
+      },
+      //更改任务类型
+      changeType(e){
+        let index=parseInt(e.currentTarget.dataset.index);
+        let type=parseInt(e.currentTarget.dataset.type);
+        this.data.params.homeworkItems[index].type=type;
+        this.setData({
+          params:this.data.params
+        });
+      },
+      //添加子作业
+      addWorkItem(){
+        this.data.params.homeworkItems.push({content:'', type:1,attachment:[]});
+        this.setData({
+          params:this.data.params
+        })
+      },
+      //删除子作业
+      removeWorkItem(e){
+        let index=parseInt(e.currentTarget.dataset.index);
+        this.data.params.homeworkItems.splice(index,1);
+        this.setData({
+          params:this.data.params
+        })
+      },
+      workItemContChange(e){
+        let index=parseInt(e.currentTarget.dataset.index);
+        this.data.params.homeworkItems[index].content=e.detail.value;
+        this.setData({
+          params:this.data.params
+        });
+      },
+      titleChange(e){
+        this.data.params.title=e.detail.value;
+        this.setData({
+          params:this.data.params
+        });
+      },
+      bindDateChange(e){
+        this.setData({
+          enddate:e.detail.value
+        });
+        let now=dayjs().format('YYYY-MM-DD');
+        if(now==e.detail.value){
+          this.data.startTime=dayjs().format('HH:mm');
+          this.setData({
+            startTime:this.data.startTime
+          });
+          let nowTime=parseInt(dayjs().format('HHmm'));
+          let _endTime=parseInt(this.data.endtime.replace(':',''));
+          if(_endTime<nowTime){
+            this.data.endtime=dayjs().format('HH:mm');
+            this.setData({
+              endtime:this.data.endtime
+            });
+          }
+        }else{
+          this.data.startTime='';
+          this.setData({
+            startTime:this.data.startTime
+          });
+        }
+      },
+      bindTimeChange(e){
+
+        this.setData({
+          endtime:e.detail.value
+        })
+      },
+
+      //更改标题
+      changeTitle(){
+        debugger;
+        if(this.data.params.title==='' || this.data.params.title.length===12){
+          let now=dayjs().format('YYYYMMDD');
+          let subjectName=this.data.classList[this.data.selectedClassIndex].subjectList[this.data.currentSubjectIndex].name;
+          this.data.params.title=`${now}${subjectName}作业`;
+          this.setData({
+            'params.title':this.data.params.title
+          })
+        }
+      },
+      async submit(){
+        wechat.showLoading();
+        let params=this.data.params;
+        if(params.title==''){
+          wx.hideLoading();
+          this.$toast('标题不能为空');
+          return false;
+        }
+
+        if(params.homeworkItems[0].type==4){
+          if(this.data.scope.length<=0){
+            wx.hideLoading();
+            this.$toast('请先选择口算题目');
+            return false;
+          }
+          let execIds=[];
+          this.data.scope.map(item=>{
+            execIds.push(item.id);
+          });
+          params.homeworkItems[0].execIds=execIds;
+          params.homeworkItems[0].execScore=this.data.passPicker[1][this.data.passPickerIndex[1]].value;
+          params.homeworkItems[0].execTimeTotal=this.data.passPicker[0][this.data.passPickerIndex[0]].value;
+        }else{
+          for(let i=0;i<params.homeworkItems.length;i++){
+            if(params.homeworkItems[i].content===''){
+              wx.hideLoading();
+              this.$toast('作业内容不能为空，你重新填写');
+              return false;
+              break;
+            }
+          }
+        }
+
+
+        debugger;
+        let finishDate=this.data.enddate+' '+this.data.endtime;
+        finishDate=finishDate.replace(/-/g,'/');
+        finishDate=dayjs(finishDate).format('YYYY-MM-DD HH:mm');
+        let res;
+        if(this.$route.query.id){
+          res=await this.$api.work.update({
+            ...params,
+            finishDate:finishDate,
+            classIds:[this.data.classList[this.data.selectedClassIndex].classId],
+            subjectId:params.homeworkItems[0].type==4?2:this.data.classList[this.data.selectedClassIndex].subjectList[this.data.currentSubjectIndex].id,
+            homeworkId:this.$route.query.id
+          });
+          wx.hideLoading();
+          if(res.rcode==300){
+            this.$router.back();
+          }
+        }else{
+          res=await this.$api.work.create({
+            ...params,
+            finishDate:finishDate,
+            classIds:[this.data.classList[this.data.selectedClassIndex].classId],
+            subjectId:params.homeworkItems[0].type==4?2:this.data.classList[this.data.selectedClassIndex].subjectList[this.data.currentSubjectIndex].id,
+          });
+          wx.hideLoading();
+          let type=params.homeworkItems[0].type;
+          if(res.rcode==300){
+            this.$router.redirect(`/pages/work/success?className=${this.data.classList[this.data.selectedClassIndex].className}&id=${res.data[0]}&type=${type}`)
+          }
+        }
+
+        //口算任务布置完要清空选择的题目范围
+        if(params.homeworkItems[0].type==4){
+          this.ClearSelectScope();
+        }
+
+
+
+      },
+      async getWorkInfo(id){
+        let res=await this.$api.work.show({homeworkId:id});
+        if(res.rcode==300){
+          this.data.params.title=res.data.title;
+          this.data.params.homeworkItems=res.data.homeworkItems;
+          this.data.params.subjectId=res.data.subjectId;
+          this.data.enddate=dayjs(res.data.submitDate.replace(/-/g,'/')).format('YYYY-MM-DD');
+          this.data.endtime=dayjs(res.data.submitDate.replace(/-/g,'/')).format('HH:mm');
+          this.data.params.classIds=[res.data.classId];
+          this.data.imagesBase64List=[];
+          this.data.params.homeworkItems.map((item,index)=>{
+            this.data.imagesBase64List[index]=[];
+            item.content=item.title;
+            if(item.attachment && item.attachment.length>0){
+              item.attachment.map(image=>{
+                this.data.imagesBase64List[index].push(image);
+              });
+            }
+          });
+
+          this.setData({
+            params:this.data.params,
+            imagesBase64List:this.data.imagesBase64List,
+            enddate:this.data.enddate,
+            endtime:this.data.endtime
+          })
+
+        }
+      },
+      //初始化数据
+      initData(){
+        return new Promise((resolve)=>{
+          this.setData({
+            imagesBase64List:[],
+            params:{
+              title:'',
+              homeworkItems:[{
+                content:'',
+                type:1,
+                attachment:[]
+              }],
+            },
+            enddate:dayjs(new Date()).add(1, 'day').format('YYYY-MM-DD'),
+            endtime:dayjs(new Date()).format('HH:mm'),
+            startDate:dayjs(new Date()).format('YYYY-MM-DD'),
+            startTime:'',
+            selectedClassIndex:0,
+            currentSubjectIndex:0
+          });
+          resolve();
+        })
+      },
+      toChooseIssue(){
+        this.$router.navigate(`/pages/work/scope?grade=${this.data.classList[this.data.selectedClassIndex].grade}`)
+      },
+      //设置口算分钟picker列表值
+      setComputeMinList(){
+        let scoreList=[];
+        for(let i=10;i<100;){
+          scoreList.push({value:i,name:i+'分'});
+          i+=5;
+        }
+        let min=[];
+        for(let i=1;i<10;i++){
+          min.push({value:i,name:i+'分钟'});
+        }
+        for(let i=10;i<60;){
+          min.push({value:i,name:i+'分钟'});
+          i+=5;
+        }
+        for(let i=60;i<=180;){
+          min.push({value:i,name:i+'分钟'});
+          i+=30;
+        }
+        this.setData({
+          passPicker:[min,scoreList]
+        });
+      },
+      //口算达标更改选项事件
+      bindPassPickerChange(e){
+        this.setData({
+          passPickerIndex:e.detail.value
+        })
+      },
+      //题目预览切换
+      async prewTogggle(e){
+        if(e.type && e.type=='modaltoggle'){
+          this.setData({
+            isShowPrew:e.detail
+          })
+        }else{
+          if(this.data.isShowPrew){
+            this.setData({
+              isShowPrew:false
+            })
+          }else{
+            let ruleIds=[];
+            this.data.scope.map(item=>{
+              ruleIds.push(item.id);
+            });
+            ruleIds=ruleIds.join(',');
+            let res=await this.$api.calc.issueList({ruleIds:ruleIds,preview:true,total:this.data.scope.length*10});
+            if(res.rcode==300){
+              res.data.exercisesList.map(item=>{
+                item.content=item.content.replace(/#/g,'___')
+              });
+              this.setData({
+                issueList:res.data.exercisesList,
+                isShowPrew:true
+              })
+            }
+          }
+        }
+
+      }
+    },
+
+  })
+</script>
+<style lang="scss" src="./publish.scss"></style>

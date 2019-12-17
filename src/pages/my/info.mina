@@ -1,0 +1,87 @@
+<config>
+{
+  "navigationBarTitleText":"个人资料",
+}
+</config>
+
+<template>
+  <view class="my-info">
+    <view class="user-info section">
+      <view class="section-top">
+        <text class="section-title">个人信息</text>
+      </view>
+      <view class="section-cont section-item">
+        <view class="user-info-list">
+          <view class="user-info-item flex flex-align-center">
+            <view class="key">学校</view>
+            <view class="value">{{info.schoolName}}</view>
+          </view>
+          <view class="user-info-item flex flex-align-center">
+            <view class="key">姓名</view>
+            <view class="value">{{info.name}} 老师</view>
+          </view>
+          <view class="user-info-item flex flex-align-center">
+            <view class="key">电话</view>
+            <view class="value">{{info.mobile}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="class-info section">
+      <view class="section-top">
+        <text class="section-title">带班信息</text>
+      </view>
+      <view class="cont">
+        <view class="class-info-list">
+          <view class="class-info-item section-item" wx:for="{{classList}}" wx:key="{{index}}">
+            <view class="top flex flex-align-center">
+              <view class="name flex1">{{item.className}}</view>
+              <!--<view class="invite" wx:if="{{item.teacherRole==1}}" catchtap="openStu"><text class="iconfont icon-icon-test"></text>邀请进班</view>-->
+            </view>
+
+            <view class="cont">
+              <view class="class-info-item-msg flex flex-align-center">
+                <view class="key">角色</view>
+                <view class="value flex1">{{item.teacherRole==1?'班主任':item.teacherRole==2?'任课老师':''}}</view>
+              </view>
+              <view class="class-info-item-msg flex flex-align-center">
+                <view class="key">科目</view>
+                <view class="value flex1"><text wx:for="{{item.subjectList}}" wx:for-item="subject" wx:key="{{subject.id}}">{{subject.name}}</text></view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import wechat from '@/until/wechat'
+  import {tinax} from '@/store'
+  Page.define({
+    mixins: [
+      tinax.connect({
+        getters (getters) {
+          return {
+            info: getters.getUserInfo(),
+            classList: getters.getClassList(),
+          };
+        }
+      }),
+    ],
+    data: {
+
+    },
+    async onLoad(){
+
+    },
+    methods:{
+
+    }
+
+  })
+</script>
+<style lang="scss" src="./info.scss"></style>

@@ -1,0 +1,268 @@
+<config>
+  {
+    "navigationBarTitleText":"二维码邀请"
+  }
+</config>
+<template>
+  <view class="share-wrapper">
+    <view class="share-box">
+      <image class="share-pic" src="/assets/images/class/invitation-bg.jpg"></image>
+      <view class="share-tch-msg flex flex-align-center">
+        <view class="tch-pic">
+          <image src="{{info.pic}}" wx:if="{{info.pic && info.pic !== '' && info.pic !== null}}"></image>
+          <image src="../../assets/images/avatar.png" wx:else></image>
+        </view>
+        <view class="flex1 flex flex-v flex-pack-center">
+          <view class="tch-name">班主任{{info.name}}</view>
+          <view class="tch-text">邀请你加入</view>
+        </view>
+      </view>
+      <view class="class-name">{{className}}</view>
+      <view class="code">
+        <image src="data:image/png;base64,{{imgCode}}"></image>
+      </view>
+      <canvas class="canvas" canvas-id="share" />
+    </view>
+    <view class="copy-btn mt-40 {{loading ? 'grey-btn' : ''}}" bindtap="handleSave">保存图片至相册</view>
+  </view>
+</template>
+<script>
+  import {Page} from '@tinajs/tina';
+  import wechat from '@/until/wechat'
+  import {tinax} from '@/store'
+  Page.define({
+    mixins: [
+      tinax.connect({
+        getters (getters) {
+          return {
+            info: getters.getUserInfo(),
+          };
+        }
+      }),
+    ],
+    data: {
+      classId: '',
+      className: '',
+      imgCode: '',
+      imageFile: '',
+      loading: true,
+    },
+    beforeLoad() {
+    },
+    onLoad() {
+    },
+    onReady() {
+    },
+    async onShow() {
+      wx.showLoading({
+        title: '加载中',
+      })
+      this.setData({
+        laoding: true
+      })
+      if(this.$route.query.id){
+        this.setData({
+          classId: this.$route.query.id
+        })
+      }
+      if (this.$route.query.className) {
+        this.setData({
+          className: this.$route.query.className
+        })
+      }
+      let codeParams = {
+        classysId: this.data.classId
+      }
+      let res = await this.$api.classroom.getwxacode(codeParams)
+      if (res.rcode === 300) {
+        let imgCode = res.data.image
+        this.setData({
+          imgCode: imgCode
+        })
+        this.draw(imgCode)
+      }
+
+    },
+    onHide() {
+    },
+    onUnload() {
+    },
+    compute() {
+    },
+    methods: {
+      createRpx2px() {
+        const { windowWidth } = wx.getSystemInfoSync()
+        return function(rpx) {
+          return parseInt(windowWidth / 750 * rpx)
+        }
+      },
+      getImageInfo(url) {
+        return new Promise((resolve, reject) => {
+          wx.getImageInfo({
+            src: url,
+            success: resolve,
+            fail: reject,
+          })
+        })
+      },
+      canvasToTempFilePath(option, context) {
+        return new Promise((resolve, reject) => {
+          wx.canvasToTempFilePath({
+            ...option,
+            success: resolve,
+            fail: reject,
+          }, context)
+        })
+      },
+      saveImageToPhotosAlbum(option) {
+        return new Promise((resolve, reject) => {
+          wx.saveImageToPhotosAlbum({
+            ...option,
+            success: resolve,
+            fail: reject,
+          })
+        })
+      },
+      // 把base64转换成二进制图片文件
+      base64src (base64data) {
+        const fsm = wx.getFileSystemManager()
+        const FILE_BASE_NAME = 'tmp_base64src'
+        return new Promise((resolve, reject) => {
+          const [, format, bodyData] = /data:image\/(\w+);base64,(.*)/.exec(base64data) || [];
+          if (!format) {
+            reject(new Error('ERROR_BASE64SRC_PARSE'));
+          }
+          const filePath = `${wx.env.USER_DATA_PATH}/${FILE_BASE_NAME}.${format}`
+          const buffer = wx.base64ToArrayBuffer(bodyData)
+          fsm.writeFile({
+            filePath,
+            data: buffer,
+            encoding: 'binary',
+            success() {
+              resolve(filePath);
+            },
+            fail() {
+              reject(new Error('ERROR_BASE64SRC_WRITE'));
+            },
+          })
+        })
+      },
+      async draw(imgCode) {
+        // 实际绘制函数，后续绘制代码放于此处
+        const oriCodeImg = await this.base64src('data:image/png;base64,' + imgCode)
+        const codeImgPromise = this.getImageInfo(oriCodeImg)
+
+        let headPicPromise = ''
+        if (this.data.info.pic !== null) {
+          headPicPromise = this.getImageInfo(this.data.info.pic)
+          Promise.all([headPicPromise, codeImgPromise]).then(([headPic, codeImg]) => {
+            this.goCanvasDraw(headPic, codeImg, true)
+          })
+        } else {
+          headPicPromise = '/assets/images/avatar.png'
+          Promise.all([codeImgPromise]).then(([codeImg]) => {
+            this.goCanvasDraw(headPicPromise, codeImg, false)
+          })
+        }
+      },
+      goCanvasDraw (headPic, codeImg, avatarHasPath) {
+        const bgUrl = '/assets/images/class/invitation-bg.jpg'
+        const rpx2px = this.createRpx2px()
+
+        const ctx = wx.createCanvasContext('share', this)
+        const canvasWidth = rpx2px(630 * 2)
+        const canvasHeight = rpx2px(1004 * 2)
+        // 绘制背景，填充满整个canvas画布
+        ctx.drawImage(bgUrl, 0, 0, canvasWidth, canvasHeight)
+
+        const avatarWidth = rpx2px(80 * 2)
+        const avatarHeight = rpx2px(80 * 2)
+        const avatarTop = rpx2px(166 * 2)
+        const avatarLeft = rpx2px(92 * 2)
+        ctx.save()
+        ctx.beginPath(); //开始绘制
+        ctx.arc(avatarWidth / 2 + avatarLeft, avatarHeight / 2 + avatarTop, avatarWidth / 2, 0, Math.PI * 2, false)
+        ctx.clip()
+        // 绘制头像
+        ctx.drawImage(
+          avatarHasPath ? headPic.path : headPic,
+          avatarLeft,
+          avatarTop,
+          avatarWidth,
+          avatarHeight
+        )
+        ctx.restore()
+        const codeWidth = rpx2px(162 * 2)
+        const codeHeight = rpx2px(162 * 2)
+        const codeTop = rpx2px(738 * 2)
+        const codeLeft = rpx2px(92 * 2)
+        // 绘制二维码
+        ctx.drawImage(
+          codeImg.path,
+          codeLeft,
+          codeTop,
+          codeWidth,
+          codeHeight
+        )
+        // 绘制用户名
+        const tchName = `班主任${this.data.info.name}`
+        ctx.setFontSize(rpx2px(28 * 2))
+        ctx.setFillStyle('#63cdee')
+        ctx.fillText(
+          tchName,
+          rpx2px(195 * 2),
+          rpx2px(202 * 2),
+        )
+        // 绘制相关文字
+        const text = '邀请你加入'
+        ctx.setFontSize(rpx2px(26 * 2))
+        ctx.setFillStyle('#333333')
+        ctx.fillText(
+          text,
+          rpx2px(195 * 2),
+          rpx2px(240 * 2)
+        )
+        // 绘制班级名
+        const className = this.data.className
+        ctx.setFontSize(rpx2px(40 * 2))
+        ctx.setFillStyle('#f99d1b')
+        ctx.fillText(
+          className,
+          rpx2px(233 * 2),
+          rpx2px(351 * 2)
+        )
+        ctx.stroke()
+        // 完成作画
+        ctx.draw(false, () => {
+          this.canvasToTempFilePath({
+            canvasId: 'share',
+          }, this).then(({ tempFilePath }) => {
+            this.setData({
+              imageFile: tempFilePath,
+              loading: false
+            })
+            wx.hideLoading()
+          })
+        })
+      },
+      handleSave() {
+        if (this.data.loading) {
+          return
+        }
+        const { imageFile } = this.data
+        if (imageFile) {
+          this.saveImageToPhotosAlbum({
+            filePath: imageFile,
+          }).then(() => {
+            wx.showToast({
+              icon: 'none',
+              title: '分享图片已保存至相册',
+              duration: 2000,
+            })
+          })
+        }
+      }
+    }
+  })
+</script>
+<style lang="scss" src="./invitation.scss"></style>

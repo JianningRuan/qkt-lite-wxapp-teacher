@@ -1,0 +1,21 @@
+{
+  "appDir": "./dist/assets",
+  "cos": {
+    "secret_id": "AKIDKZhjcKNIavDLOIkZwOn5LafYHqERuZVG",
+    "secret_key": "pUxFXcYJtIWZR9kAPSM4oV2OZZP4Yu6B",
+    "bucket": "qktlite-1253493352",
+    "region": "ap-guangzhou", //创建 bucket 时选择的地域简称
+    "folder": "/teacher/assets" //资源存放在 bucket 的哪个目录下
+  },
+  "uploadFileSuffix": [".jpg",".png",".gif",".webp",".svg"],
+  "uploadFileBlackList": [
+    "./dist/assets/images/tabbar/tabbar-index.png",
+    "./dist/assets/images/tabbar/tabbar-index-active.png",
+    "./dist/assets/images/tabbar/tabbar-message.png",
+    "./dist/assets/images/tabbar/tabbar-message-active.png",
+    "./dist/assets/images/tabbar/tabbar-person.png",
+    "./dist/assets/images/tabbar/tabbar-person-active.png",
+    "./dist/assets/images/tabbar/tabbar-work.png",
+    "./dist/assets/images/tabbar/tabbar-work-active.png"
+  ]
+}

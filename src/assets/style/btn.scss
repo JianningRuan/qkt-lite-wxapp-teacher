@@ -1,0 +1,57 @@
+@import "./base.scss";
+.btn{
+  outline: 0;
+  display: inline-block;
+  line-height: 60rpx;
+  padding:0rpx 10rpx;
+  border-radius: 30rpx;
+  text-align: center;
+  border: 1px solid #000000;
+  min-width: 163rpx;
+  box-sizing: border-box;
+
+  &.btn-primary{
+    background: $mainColor;
+    border-color: $mainColor;
+    color: #ffffff;
+    &.btn-plain{
+      color: $mainColor;
+    }
+  }
+
+  &.btn-gray{
+    background: #dddddd;
+    border-color: #dddddd;
+    color: #ffffff;
+    &.btn-plain{
+      color: #999999;
+    }
+  }
+
+  &.btn-lg{
+    font-size: 32rpx;
+
+    border-radius:44rpx;
+    line-height: 84rpx;
+  }
+
+  &.btn-block{
+    display: block;
+  }
+
+  &.btn-plain{
+    background: #ffffff;
+  }
+
+}
+
+.btn-group{
+  text-align: center;
+  .btn{
+    margin-right: 30rpx;
+
+    &:last-child{
+      margin-right: 0;
+    }
+  }
+}

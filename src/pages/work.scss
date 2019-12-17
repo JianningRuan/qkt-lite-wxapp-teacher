@@ -1,0 +1,89 @@
+@import "../assets/style/base.scss";
+
+#tabbar-work{
+  .top{
+    padding: 40rpx 30rpx 0 30rpx;
+    background: $mainColor;
+    color: #ffffff;
+    position: relative;
+    .bg{
+      position: absolute;
+      width: 100%;
+      right: 0;
+      bottom: 0;
+    }
+    .date{
+      font-size: 48rpx;
+      font-weight: bold;
+      position: relative;
+      z-index: 2;
+    }
+    .tab{
+      margin-top: 55rpx;
+      padding-bottom: 20rpx;
+      .tab-item{
+        margin-right: 54rpx;
+
+        &.active{
+          position: relative;
+          &:after{
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            background: #ffffff;
+            width: 56rpx;
+            height: 4rpx;
+            margin-left: -28rpx;
+            margin-bottom: -16rpx;
+          }
+        }
+      }
+    }
+  }
+
+  .work-list{
+
+    .work-item{
+      box-shadow: 0 0 10rpx rgba(102,102,102,0.15);
+      border-radius: 10rpx;
+      margin-bottom: 30rpx;
+
+      .work-item-top{
+        padding: 30rpx;
+        .icon{
+          width: 50rpx;
+          height: 50rpx;
+          margin-right: 16rpx;
+        }
+        .name{
+          color: #333333;
+          font-weight: bold;
+          margin-right: 15rpx;
+          @extend .textOverflowEllipsis;
+        }
+        .finish{
+          color: #999999;
+        }
+      }
+
+      .work-item-bottom{
+        border-top: 1px solid #e5e5e5;
+        padding: 30rpx;
+
+        .work-item-task{
+          color: #666666;
+          margin-bottom: 15rpx;
+          &:last-child{
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+    .tips{
+      text-align: center;
+      font-size: 24rpx;
+      color: #666666;
+    }
+  }
+}

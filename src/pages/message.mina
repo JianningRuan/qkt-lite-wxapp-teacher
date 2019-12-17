@@ -1,0 +1,89 @@
+<config>
+{
+  "navigationBarTitleText":"消息",
+  "usingComponents": {
+    "skeleton": "../components/skeleton/skeleton.mina",
+  }
+}
+</config>
+
+
+
+<template>
+  <skeleton selector="skeleton" loading="spin" bgcolor="#FFF" wx:if="{{showSkeleton}}"></skeleton>
+
+  <view id="tabbar-message" class="skeleton">
+    <vie class="mseeage-section-list">
+      <view class="message-section-item flex" catchtap="toNoticeList" data-type="3">
+        <view class="icon skeleton-radius"><image src="../assets/images/message/setting.svg"></image></view>
+        <view class="cont flex1 skeleton-rect">
+          <view class="name">系统通知</view>
+          <view class="drsc">{{noticeList[0].title || '暂无新的信息'}}</view>
+        </view>
+        <view class="time flex-align-start">{{noticeList[0].createTime}}</view>
+      </view>
+      <view class="message-section-item flex" catchtap="toNoticeList" data-type="4" data-id="{{noticeList[1].relevanceId}}">
+        <view class="icon skeleton-radius"><image src="../assets/images/message/notice.svg"></image></view>
+        <view class="cont flex1 skeleton-rect">
+          <view class="name">作业通知</view>
+          <view class="drsc">{{noticeList[1].title || '暂无新的信息'}}</view>
+        </view>
+        <view class="time flex-align-start">{{noticeList[1].createTime }}</view>
+      </view>
+      <view class="message-section-item flex" catchtap="toMyNotice">
+        <view class="icon skeleton-radius"><image src="../assets/images/message/voice.svg"></image></view>
+        <view class="cont flex1 skeleton-rect">
+          <view class="name">我发起的</view>
+          <view class="drsc">{{noticeList[2].title || '暂无新的信息'}}</view>
+        </view>
+        <view class="time flex-align-start">{{noticeList[2].createTime}}</view>
+      </view>
+    </vie>
+  </view>
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import wechat from '@/until/wechat'
+  import dayjs from 'dayjs'
+  Page.define({
+    data: {
+      noticeList:[],
+      showSkeleton:true
+    },
+    async onLoad(){
+
+    },
+    onShow(){
+      this.getMessage();
+    },
+    methods:{
+      async getMessage(){
+        let res= await this.$api.notice.list();
+        if(res.rcode==300){
+          res.data.noticeList.map((item)=>{
+            if(item){
+              item.createTime=dayjs(item.createTimestamp).format('MM-DD');
+            }
+          })
+          this.setData({
+            noticeList:res.data.noticeList,
+            showSkeleton:false
+          })
+        }
+      },
+      toNoticeList(e){
+        let type=e.currentTarget.dataset.type;
+
+        this.$router.navigate(`/pages/notice/list?type=${type}`);
+
+      },
+      toMyNotice(){
+        this.$router.navigate(`/pages/notice/my`);
+      },
+
+    }
+
+  })
+</script>
+<style lang="scss"  src="./message.scss"></style>

@@ -1,0 +1,161 @@
+@import "../../assets/style/base.scss";
+page{
+  padding-bottom: 132rpx;
+}
+
+.notice-publish{
+  padding: 30rpx;
+
+  .section-item{
+
+    &.noticle-title{
+      padding: 0 30rpx;
+      input{
+        line-height: 88rpx;
+        height: 88rpx;
+      }
+    }
+  }
+
+  &.select-section{
+    border-top: 30rpx solid rgb(248,248,248);
+    .section-item{
+      padding: 0 30rpx;
+    }
+  }
+
+  .set-title{
+    line-height: 88rpx;
+    padding: 0 30rpx;
+    box-shadow:0 0 10rpx rgba(102, 102, 102, 0.15);
+    border-radius:10rpx;
+    margin-bottom: 30rpx;
+    height: 88rpx;
+    .input{
+      color: rgb(51,51,51);
+    }
+    text{
+      color: rgb(102,102,102)
+    }
+  }
+
+
+  .label{
+    color: #999999;
+  }
+
+  .notice-type{
+
+  }
+
+
+  .notice-content{
+    .textarea{
+      border-bottom: 1px solid #e5e5e5;
+    }
+    .attchment{
+      margin-top: 30rpx;
+      .title{
+        color: #999999;
+        text{
+          margin-left: 15rpx;
+        }
+      }
+      .image-list{
+        .image-item{
+          width: calc((100% - (20rpx * 2)) / 5);
+          padding-bottom: calc((100% - (20rpx * 3)) / 5);
+          margin-right: 20rpx;
+          margin-bottom: 20rpx;
+        }
+      }
+    }
+  }
+
+
+
+  .select-section-list{
+    .select-section-item{
+      border-bottom: 1px solid #e5e5e5;
+      padding: 15rpx 0;
+      &:first-child{
+        padding-top: 0;
+      }
+      .no{
+        color: #333333;
+        font-weight: bold;
+        margin-right: 30rpx;
+      }
+      .input{
+        margin-right: 30rpx;
+      }
+      .iconfont{
+        color: #e24027;
+      }
+    }
+    .add{
+      font-size: 24rpx;
+      color: #40b3ff;
+      margin-top: 30rpx;
+      text-align: center;
+    }
+  }
+
+  .other-msg-list{
+    .class-picker{
+      border-bottom: 1px solid #e5e5e5;
+    }
+    picker{
+      border-bottom: 1px solid #e5e5e5;
+      &:last-child{
+        border-bottom: 0;
+      }
+
+      .other-msg-item{
+        line-height: 86rpx;
+
+        position: relative;
+        &:first-child{
+          padding-top: 0;
+        }
+
+
+
+        .iconfont{
+          margin-left: 16rpx;
+          color: #999999;
+        }
+      }
+    }
+  }
+}
+
+.submit-btn{
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 30rpx;
+  box-sizing: border-box;
+  background: #ffffff;
+  z-index:9;
+  box-shadow:0 0 10rpx rgba(0,0,0,0.2);
+
+}
+
+.select-scope{
+  height: 700rpx;
+  .select-scope-item{
+    border-bottom: 1px solid #e5e5e5;
+    padding: 30rpx 0;
+    .iconfont{
+      font-size: 24rpx;
+      margin-left: 5rpx;
+      margin-right: 15rpx;
+    }
+  }
+}
+
+
+
+

@@ -1,0 +1,22 @@
+@import "../../assets/style/base.scss";
+@import "../../assets/style/font.scss";
+
+.scroller-top{
+  position: fixed;
+  right: 0;
+  bottom: -100%;
+  width: 80rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: $mainColor;
+  box-shadow: 0 0 10rpx rgba(0,0,0,0.2);
+  margin-bottom: 50rpx;
+  margin-right: 30rpx;
+  z-index: 98;
+  text{
+    color: #ffffff;
+    font-size: 46rpx;
+  }
+}

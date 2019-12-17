@@ -1,0 +1,141 @@
+<config>
+{
+  "navigationBarTitleText":"布置作业",
+  "usingComponents": {
+    "scroller-top": "../../components/scroller-top/scroller-top.mina",
+    "is-null": "../../components/is-null/is-null.mina",
+    "pagation": "../../components/pagation/pagation.mina",
+  }
+}
+</config>
+
+
+
+<template>
+  <view class="notice-list">
+    <block wx:if="{{notices.length>0}}">
+      <view class="notice-item flex flex-align-start section-item" wx:for="{{notices}}" catchtap="toDetail" data-item="{{item}}">
+        <view class="avatar">
+          <image src="../../assets/images/message/system.jpg" wx:if="{{params.type==3}}"></image>
+          <block wx:else>
+            <image src="{{item.pic}}" wx:if="{{item.pic && item.pic!=''}}"></image>
+            <image src="../../assets/images/avatar.png" wx:else></image>
+          </block>
+
+        </view>
+        <view class="cont flex1">
+          <view class="top flex flex-align-center">
+            <text class="name flex1">{{params.type==3?'全课通':item.userName}}</text>
+            <text class="time">{{item.createTime}}</text>
+          </view>
+          <view class="drsc">
+            {{item.title}}
+          </view>
+        </view>
+      </view>
+      <pagation params="{{params}}"></pagation>
+    </block>
+    <block wx:else>
+      <is-null><text slot="tips">暂无{{params.type==3?'系统':params.type==4?'作业':''}}通知</text> </is-null>
+    </block>
+  </view>
+  <scroller-top scrollTop="{{scrollTop}}"></scroller-top>
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import dayjs from 'dayjs'
+  Page.define({
+    data: {
+      params:{
+        page:1,
+        pageSize:12,
+        type:1,
+      },
+      notices:[],
+      scrollTop:0
+    },
+    async onLoad(){
+      let type=this.$route.query.type;
+      if(type){
+        this.data.params.type=type;
+        this.setData({
+          params:this.data.params
+        })
+        if(type==3){
+          wx.setNavigationBarTitle({
+            title: '系统通知'
+          })
+        }else if(type==4){
+          wx.setNavigationBarTitle({
+            title: '作业通知'
+          })
+        }
+      }
+      this.getList();
+    },
+    onShow(){
+
+    },
+    methods:{
+      async getList(cover){
+        return new Promise(async(resolve)=>{
+          let res= await this.$api.notice.get(this.data.params);
+          if(res.rcode==300){
+            res.data.noticeList.map((item)=>{
+              item.createTime=dayjs(item.createTimestamp).format('MM.DD')
+            });
+            this.data.params.totalPage=res.data.totalPage;
+            if(cover){
+              this.data.notices=res.data.noticeList;
+            }else{
+              this.data.notices=this.data.notices.concat(res.data.noticeList);
+            }
+            this.setData({
+              notices:this.data.notices
+            })
+            resolve();
+          }else{
+            resolve();
+          }
+        })
+      },
+      toDetail(e){
+        let item=e.currentTarget.dataset.item;
+        if(item.type==4){
+          let relevanceId=item.relevanceId;
+          if(relevanceId){
+            this.$router.navigate(`/pages/work/info?id=${relevanceId}`);
+          }
+        }else{
+          this.$router.navigate(`/pages/notice/detail?id=${item.id}`);
+        }
+      },
+    },
+
+    onPageScroll({scrollTop}){
+      this.setData({
+        'scrollTop':scrollTop
+      })
+    },
+    async onReachBottom(){
+      if(!this.data.params.totalPage || (this.data.params.totalPage && this.data.params.page<this.data.params.totalPage)){
+        this.data.params.page++;
+        this.setData({
+          "params.loading":true
+        })
+        await this.getList();
+        this.setData({
+          "params.loading":false
+        })
+      }else{
+        this.setData({
+          'params.nothing':true
+        })
+      }
+    },
+
+
+  })
+</script>
+<style lang="scss" src="./list.scss"></style>

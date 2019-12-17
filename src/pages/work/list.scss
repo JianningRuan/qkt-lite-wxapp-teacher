@@ -1,0 +1,47 @@
+@import "../../assets/style/base.scss";
+
+.work-list{
+  padding: 30rpx;
+
+  .work-item{
+    box-shadow: 0 0 10rpx rgba(102,102,102,0.15);
+    border-radius: 10rpx;
+    margin-bottom: 30rpx;
+
+    .work-item-top{
+      padding: 30rpx;
+      .icon{
+        width: 50rpx;
+        height: 50rpx;
+        margin-right: 15rpx;
+      }
+      .name{
+        color: #333333;
+        font-weight: bold;
+        margin-right: 15rpx;
+        @extend .textOverflowEllipsis;
+      }
+      .finish{
+        color: #999999;
+      }
+    }
+
+    .work-item-bottom{
+      border-top: 1px solid #e5e5e5;
+      padding: 30rpx;
+
+      .work-item-task{
+        color: #666666;
+        margin-bottom: 15rpx;
+        &:last-child{
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+  .tips{
+    text-align: center;
+    font-size: 24rpx;
+    color: #666666;
+  }
+}

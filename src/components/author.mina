@@ -1,0 +1,15 @@
+<config>
+{
+  "component": true
+}
+</config>
+
+<template>
+  <view> Yibin Chen </view>
+</template>
+
+<script>
+Component({
+
+})
+</script>

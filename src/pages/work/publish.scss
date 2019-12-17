@@ -1,0 +1,91 @@
+@import "../notice/publish.scss";
+
+
+
+
+.work-publish-item{
+
+  .middle{
+    margin-top: 18rpx;
+    .addAttch{
+      color: rgb(64,179,255);
+    }
+  }
+
+  .input{
+    padding: 40rpx 0 30rpx 0;
+    border-bottom: 1px solid #e5e5e5;
+
+  }
+  .option-list{
+
+  }
+
+  .attchment{
+    margin-top: 30rpx;
+    .attchment-title{
+      color: #999999;
+    }
+    .image-list{
+      .image-item{
+        width: calc((100% - (30rpx * 3)) / 4);
+        padding-bottom: calc((100% - (30rpx * 3)) / 4);
+        &:nth-child(3n){
+          margin-right: 30rpx;
+        }
+        &:nth-child(4n){
+          margin-right: 0;
+        }
+      }
+    }
+  }
+}
+
+.add-tips{
+  border: 1px dashed #40b3ff;
+  border-radius: 10rpx;
+  line-height: 84rpx;
+  color:#40b3ff;
+  box-sizing: border-box;
+  text{
+    margin-right: 10rpx;
+  }
+}
+
+
+.select-issue{
+  .content{
+    min-height: 50rpx;
+    color: #e7925e;
+  }
+  .text-right{
+    color: $mainColor;
+  }
+}
+
+.submit-btn{
+  .btn{
+    margin-bottom: 30rpx;
+    &:last-child{
+      margin-bottom: 0;
+    }
+  }
+}
+
+.calc-prew-list{
+  height: 600rpx;
+  .calc-prew-item{
+    line-height: 70rpx;
+  }
+}
+
+.compute-pass{
+  position: relative;
+  .key{
+    color: #999999;
+  }
+  .value{
+
+  }
+}
+

@@ -1,0 +1,68 @@
+@import "../../assets/style/base.scss";
+
+.notice-my{
+  padding: 30rpx;
+  .tab{
+    text-align: center;
+
+    text{
+      display: inline-block;
+      margin-right: 70rpx;
+      color: #333333;
+      padding-bottom: 15rpx;
+
+      &.active{
+        position: relative;
+        font-weight: bold;
+        &:after{
+          content: "";
+          position: absolute;
+          left: 50%;
+          bottom: 0;
+          display: block;
+          width: 34rpx;
+          height: 4rpx;
+          background: #333333;
+          margin-left: -17rpx;
+        }
+      }
+
+      &:last-child{
+        margin-right: 0;
+      }
+    }
+  }
+
+  .tab-cont{
+    .notice-my-list{
+      margin-top: 30rpx;
+      .notice-my-item{
+        .top{
+          image{
+            width: 27rpx;
+            height: 27rpx;
+            margin-right: 16rpx;
+          }
+          .name{
+            margin-right: 15rpx;
+            font-weight: bold;
+            color: #333333;
+            @extend .textOverflowEllipsis;
+          }
+          .time{
+            font-size: 24rpx;
+            color: #999999;
+            &.red{
+              color: #e24027;
+            }
+          }
+        }
+        .finish{
+          margin-top: 30rpx;
+          color: #999999;
+          font-size: 28rpx;
+        }
+      }
+    }
+  }
+}

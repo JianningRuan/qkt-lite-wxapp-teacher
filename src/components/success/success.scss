@@ -1,0 +1,40 @@
+@import "../../assets/style/base.scss";
+@import "../../assets/style/flex.scss";
+@import "../../assets/style/btn.scss";
+
+page{
+  height: 100%;
+}
+.success-template{
+  height: 100%;
+  .success-template-msg{
+    .success-template-msg-warp{
+      margin: 0 auto;
+      text-align: center;
+      .icon{
+        image{
+          width: 482rpx;
+          height: 285rpx;
+        }
+      }
+      .title{
+        font-size: 32rpx;
+        color: #333333;
+        font-weight: bold;
+        margin-top: 60rpx;
+      }
+      .drsc{
+        margin-top: 40rpx;
+        color: #999999;
+        line-height: 50rpx;
+        text{
+          color: $mainColor;
+          margin: 0 10rpx;
+        }
+      }
+    }
+  }
+  .success-template-operate{
+    padding: 30rpx;
+  }
+}

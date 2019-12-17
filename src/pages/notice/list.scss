@@ -1,0 +1,32 @@
+@import "../../assets/style/base.scss";
+
+.notice-list{
+  padding: 30rpx;
+  .notice-item{
+    .avatar{
+      @include avatar(64rpx);
+      margin-right: 16rpx;
+      border: 1px solid #e5e5e5;
+    }
+    .cont{
+      min-width: 0;
+      .top{
+        line-height: 64rpx;
+        .name{
+          color: #333333;
+          font-weight: bold;
+          font-size: 32rpx;
+        }
+        .time{
+          font-size: 24rpx;
+          color: #999999;
+        }
+      }
+      .drsc{
+        margin-top: 30rpx;
+        color: #999999;
+        @extend .textOverflowEllipsis;
+      }
+    }
+  }
+}

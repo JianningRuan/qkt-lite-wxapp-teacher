@@ -1,0 +1,136 @@
+<config>
+{
+  "navigationBarTitleText":"我发起的",
+  "usingComponents": {
+    "scroller-top": "../../components/scroller-top/scroller-top.mina",
+    "pagation": "../../components/pagation/pagation.mina",
+    "is-null": "../../components/is-null/is-null.mina",
+  }
+}
+</config>
+
+
+
+<template>
+  <view class="notice-my">
+    <view class="tab">
+      <text class="{{params.type==1?'active':''}}" catchtap="changeType" data-type="1">普通通知</text>
+      <text class="{{params.type==2?'active':''}}" catchtap="changeType" data-type="2">报名投票</text>
+    </view>
+    <view class="tab-cont">
+      <view class="notice-my-list">
+        <block wx:if="{{notices.length>0}}">
+          <view class="notice-my-item section-item" wx:for="{{notices}}" wx:key="{{item.id}}" catchtap="toDetail" data-id="{{item.id}}">
+            <view class="top flex flex-align-center">
+              <image src="../../assets/images/home/vote.svg" wx:if="{{params.type==2}}"></image>
+              <image src="../../assets/images/home/voice.svg" wx:else></image>
+              <view class="name flex1">{{item.title}}</view>
+              <view class="time">{{item.createTime}}</view>
+            </view>
+            <view class="finish">
+              {{params.type==2?'已投票':'已读'}}：{{item.readCount}}/{{item.stuCount}}
+            </view>
+          </view>
+          <pagation params="{{params}}"></pagation>
+        </block>
+        <block wx:else>
+          <is-null><text slot="tips">空空如也~</text> </is-null>
+        </block>
+      </view>
+    </view>
+  </view>
+  <scroller-top scrollTop="{{scrollTop}}"></scroller-top>
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import wechat from '@/until/wechat'
+  import dayjs from 'dayjs'
+  Page.define({
+    data: {
+      params:{
+        page:1,
+        pageSize:12,
+        type:1
+      },
+      notices:[],
+      scrollTop:0
+    },
+    async onLoad(){
+      let type=this.$route.query.type;
+      if(type){
+        this.data.params.type=type;
+        this.setData({
+          params:this.data.params
+        })
+      }
+      this.getList();
+    },
+    methods:{
+      async getList(cover){
+        return new Promise(async(resolve)=>{
+          let res= await this.$api.notice.get(this.data.params);
+          if(res.rcode==300){
+            res.data.noticeList.map((item)=>{
+              item.createTime=dayjs(item.createTimestamp).format('YYYY.MM.DD')
+            });
+            this.data.params.totalPage=res.data.totalPage;
+            if(cover){
+              this.data.notices=res.data.noticeList;
+            }else{
+              this.data.notices=this.data.notices.concat(res.data.noticeList);
+            }
+            this.setData({
+              notices:this.data.notices,
+              params:this.data.params
+            })
+            resolve();
+          }else {
+            resolve();
+          }
+        })
+      },
+      changeType(e){
+        let type=e.currentTarget.dataset.type;
+        if(this.data.params.type!=type){
+          this.data.params.type=type;
+          this.data.params.page=1;
+          this.data.params.nothing=false;
+          this.data.params.loading=false;
+          this.setData({
+            params:this.data.params
+          })
+          this.getList(true);
+        }
+      },
+      toDetail(e){
+        let id=e.currentTarget.dataset.id;
+        this.$router.navigate(`/pages/notice/detail?id=${id}`);
+      },
+
+    },
+    onPageScroll({scrollTop}){
+      this.setData({
+        'scrollTop':scrollTop
+      })
+    },
+    async onReachBottom(){
+      if(!this.data.params.totalPage || (this.data.params.totalPage && this.data.params.page<this.data.params.totalPage)){
+        this.data.params.page++;
+        this.setData({
+          "params.loading":true
+        })
+        await this.getList();
+        this.setData({
+          "params.loading":false
+        })
+      }else{
+        this.setData({
+          'params.nothing':true
+        })
+      }
+    },
+
+  })
+</script>
+<style lang="scss" src="./my.scss"></style>

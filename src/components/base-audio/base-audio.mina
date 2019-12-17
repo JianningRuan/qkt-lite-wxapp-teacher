@@ -1,0 +1,67 @@
+<config>
+    {
+    "component": true
+    }
+</config>
+<template>
+  <view></view>
+</template>
+<script>
+    import { Component } from '@tinajs/tina';
+
+    Component.define({
+        options: {
+            addGlobalClass: true,
+        },
+        properties: {
+          src: {
+            type: String, // 类型（必填），目前接受的类型包括：String, Number, Boolean, Object, Array, null（表示任意类型）
+            value: '',
+            observer: function(newVal, oldVal, changedPath) {
+              console.log(newVal, oldVal, changedPath);
+              if (newVal === '') {
+                this.innerAudioContext.stop();
+              } else {
+                this.innerAudioContext.src = newVal;
+                this.innerAudioContext.play();
+              }
+            }
+          }
+        },
+        data: {},
+        created() {
+        },
+        attached() {
+        },
+        ready() {
+          this.innerAudioContext = wx.createInnerAudioContext();
+          this.innerAudioContext.src = this.data.src;
+
+          this.innerAudioContext.onPlay(() => {
+            this.triggerEvent('toPlay');
+          });
+          this.innerAudioContext.onPause(()=>{ });
+          this.innerAudioContext.onStop(()=>{
+            this.triggerEvent('toStop');
+          });
+          this.innerAudioContext.onEnded(()=>{
+            this.triggerEvent('onEnded');
+          });
+          this.innerAudioContext.onError((res) => {
+            console.log(res.errMsg);
+            console.log(res.errCode);
+            // 提示 录音时间过短
+            wx.showToast({
+              title: '录音出错',
+              icon: 'none',
+              duration: 2000
+            });
+          })
+        },
+        moved() {
+        },
+        detached() {
+        },
+        methods: {},
+    })
+</script>

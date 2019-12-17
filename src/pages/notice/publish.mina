@@ -1,0 +1,490 @@
+<config>
+{
+  "navigationBarTitleText":"发送通知",
+  "usingComponents": {
+    "modal": "../../components/modal/modal.mina"
+  }
+}
+</config>
+
+
+
+<template>
+  <view  class="notice-publish {{visable || hasMainteacher?'hidden-scoller':''}}">
+    <view class="section-item set-title">
+      <view class="notice-type flex flex-align-center">
+        <text class="label flex1">通知类型</text>
+        <view class="cont">
+          <view class="option-list">
+            <view class="option-item" catchtap="changeType" data-type="1">
+              <view class="option-item-icon iconfont {{params.type==1?'icon-selected':'icon-select'}}"></view>
+              <view class="option-item-name">普通通知</view>
+            </view>
+            <view class="option-item" catchtap="changeType" data-type="2">
+              <view class="option-item-icon iconfont {{params.type==2?'icon-selected':'icon-select'}}"></view>
+              <view class="option-item-name" >报名投票</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-item noticle-title">
+      <view><input type="text" value="{{params.title}}" placeholder="请输入标题" bindinput="bindInputChange" data-type="title" /></view>
+    </view>
+
+    <view class="section-item">
+      <view class="notice-content">
+        <view class="textarea">
+          <textarea hidden="{{visable || hasMainteacher}}" placeholder="请输入通知正文" value="{{params.content}}" bindinput="bindInputChange" data-type="content">
+
+          </textarea>
+        </view>
+        <view class="attchment">
+          <view class="title">添加附件 <text class="iconfont icon-image"></text></view>
+          <view class="image-list" >
+            <view class="image-item"   style="background-image: url('{{item.attachUrl}}')" catchtap="prevImg" data-index="{{index}}" wx:for="{{params.attachList}}" wx:key="{{index}}">
+              <text class="delete iconfont icon-close" catchtap="deleteImage" data-index="{{index}}"></text>
+            </view>
+            <view class="image-item" catchtap="chooseImage"  wx:if="{{params.attachList.length<3}}">
+              <text class="add iconfont icon-plus"></text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-item" wx:if="{{params.type==2}}">
+      <view class="select-section-list">
+        <view class="select-section-item flex flex-align-center" wx:for="{{params.optionList}}" wx:key="{{index}}">
+          <text class="no">{{index==0?'A':index==1?'B':index==2?'C':index==3?'D':index==4?'E':index==5?'F':index==6?'G':index==7?'H':index==8?'I':index==9?'J':index==10?'K':index==11?'L':''}}.</text>
+          <view class="input flex1">
+            <input type="text" placeholder="请输入选项" value="{{item.optionContent}}" bindinput="optionBindInput" data-index="{{index}}" />
+          </view>
+          <text class="iconfont icon-jinzhi" wx:if="{{params.optionList.length!=1}}" catchtap="removeOptionItem" data-index="{{index}}"></text>
+        </view>
+        <view class="add" catchtap="addOptionList" wx:if="{{params.optionList.length<12}}">添加选项</view>
+      </view>
+    </view>
+
+  </view>
+
+  <view class="notice-publish select-section">
+    <view class="section-item ">
+      <view class="other-msg-list">
+        <view class="other-msg-item flex flex-align-center" wx:if="{{params.type==2}}">
+          <text class="label flex1">截止日期</text>
+          <view class="datetime">
+            <picker mode="date" value="{{enddate}}" start="{{startDate}}" bindchange="bindDateChange">
+              <view class="picker">
+                {{enddateformat}}
+              </view>
+            </picker>
+          </view>
+          <view class="iconfont icon-right"></view>
+        </view>
+        <view class="other-msg-item flex flex-align-center" wx:if="{{params.type==2}}">
+          <text class="label flex1">截止时间</text>
+          <view class="datetime">
+            <picker mode="time" value="{{endtime}}" start="{{startTime}}"  bindchange="bindTimeChange">
+              <view class="picker">
+                {{endtime}}
+              </view>
+            </picker>
+          </view>
+          <view class="iconfont icon-right"></view>
+        </view>
+        <!--<view class="other-msg-item flex flex-align-center" wx:if="{{params.type==2}}">
+          <text class="label flex1">隐私设置</text>
+          <view class="option-list">
+            <view class="option-item" catchtap="privacyChange" data-type="1">
+              <view class="option-item-icon iconfont {{params.privacy==1?'icon-selected':'icon-select'}}"></view>
+              <view class="option-item-name">公开</view>
+            </view>
+            <view class="option-item" catchtap="privacyChange" data-type="2">
+              <view class="option-item-icon iconfont {{params.privacy==2?'icon-selected':'icon-select'}}"></view>
+              <view class="option-item-name">匿名</view>
+            </view>
+          </view>
+        </view>-->
+        <picker class="class-picker" bindchange="bindClassChange" value="{{selectedClassIndex}}" range="{{classList}}" range-key="className">
+          <view class="other-msg-item flex flex-align-center">
+            <text class="label flex1">班级</text>
+            <view class="datetime">{{classList[selectedClassIndex].className}}</view>
+            <view class="iconfont icon-right"></view>
+          </view>
+        </picker>
+
+        <view class="other-msg-item flex flex-align-center" catchtap="toggleModal">
+          <text class="label flex1">范围设置</text>
+          <view class="datetime">{{params.range==1?'全班':'部分学生'}}</view>
+          <view class="iconfont icon-right"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+
+
+
+  <view class="submit-btn">
+    <view class="btn btn-primary btn-lg btn-block " catchtap="submit">发布{{params.type==1?'通知':'投票'}}</view>
+  </view>
+
+  <modal visable="{{visable}}" bindmodaltoggle="toggleModal" animate="{{isAnimate}}" bindmodelAnimateEnd="modelAnimateEnd">
+    <text slot="header">选择范围</text>
+    <scroll-view scroll-y slot="body" class="select-scope">
+      <view class="select-scope-item flex flex-align-center" catchtap="rangeChange">
+        <view class="icon"><text wx:if="{{params.range==1}}"></text></view>
+        <view class="name flex1">{{classList[selectedClassIndex].className}}全班</view>
+      </view>
+
+      <view class="select-scope-item flex flex-align-center" wx:for="{{stus}}" wx:key="{{index}}" catchtap="selectStu" data-index="{{index}}" data-id="{{item.userId}}">
+        <view class="icon"><text  class="iconfont {{params.range==2 && selectedStus[index]?'icon-selected':'icon-select'}}"></text></view>
+        <view class="name flex1">{{item.userName}}</view>
+      </view>
+
+    </scroll-view>
+    <view slot="footer" class="btn btn-primary btn-lg btn-block " catchtap="toggleModal">
+      确认
+    </view>
+  </modal>
+
+  <modal visable="{{hasMainteacher}}" bindmodaltoggle="hasMainteacherToggleModal">
+    <text slot="header">提示</text>
+    <view  slot="body">
+      您不是班主任，不能发布消息哦。
+    </view>
+    <view slot="footer" class="btn btn-primary btn-lg btn-block " catchtap="back">
+      返回
+    </view>
+  </modal>
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import wechat from '@/until/wechat'
+  import dayjs from 'dayjs'
+  Page.define({
+    data: {
+      imagesBase64List:[],
+      classList:[],
+      visable:false,
+      isAnimate:false,
+      params:{
+        attachList:[],
+        classId:1,
+        content:'',
+        endTime:'',
+        optionList:[{optionContent:''}],
+        privacy:1,
+        range:1,
+        title:'',
+        type:1,
+        userRelateList:[],
+      },
+      enddate:dayjs(new Date()).add(1, 'day').format('YYYY-MM-DD'),
+      endtime:dayjs(new Date()).format('HH:mm'),
+      startDate:dayjs(new Date()).format('YYYY-MM-DD'),
+      startTime:dayjs(new Date()).format('HH:mm'),
+      stus:[],
+      selectedStus:[],
+      selectedClassIndex:0
+    },
+    compute ({ enddate }) {
+      return {
+        enddateformat: dayjs(enddate).format('YYYY年MM月DD日'),
+      }
+    },
+    async onLoad(){
+      this.initData();
+      if(this.$route.query.type){
+        this.setData({
+          "params.type":this.$route.query.type
+        })
+      }
+
+    },
+    async onShow(){
+      await this.getClassList();
+      this.getStus();
+    },
+    methods:{
+      async getClassList(){
+        return new Promise(async(resolve)=>{
+          let res=await this.$api.classroom.get();
+          if(res.rcode==300){
+            let classList=[];
+            res.data.classList.map((item)=>{
+              if(item.teacherRole==1){
+                classList.push(item);
+              }
+            })
+            if(classList.length>0){
+              this.data.params.classId=classList[0].classId;
+              this.setData({
+                classList:classList
+              });
+              resolve();
+            }else{//没有班主任角色不给发布消息
+              this.setData({
+                hasMainteacher:true
+              });
+            }
+          }else{
+            resolve();
+          }
+        })
+      },
+      async getStus(){
+        let res=await this.$api.user.stus({classId:this.data.classList[this.data.selectedClassIndex].classId});
+        if(res.rcode==300){
+          this.setData({
+            stus:res.data.stuList
+          })
+        }
+      },
+      async chooseImage(){
+        let count=3-this.data.params.attachList.length;
+        let res = await wechat.chooseImage(count);
+        wx.showLoading({
+          title: '加载中',
+          mask:true
+        });
+        let uploadRes= await wechat.upload(res,1,'work');
+        wx.hideLoading();
+        uploadRes.map((item)=>{
+          this.data.params.attachList.push({attachUrl:item});
+        });
+        this.setData({
+          params:this.data.params
+        });
+      },
+      prevImg(e){
+        let index=e.currentTarget.dataset.index;
+        let imgList=[];
+        this.data.params.attachList.map((item)=>{
+          imgList.push(item.attachUrl);
+        });
+        wx.previewImage({
+          current: imgList[index], // 当前显示图片的http链接
+          urls: imgList // 需要预览的图片http链接列表
+        });
+      },
+      deleteImage(e){
+        let index=e.currentTarget.dataset.index;
+        this.data.params.attachList.splice(index,1);
+        this.setData({
+          params:this.data.params
+        });
+      },
+      //选择通知类型
+      changeType(e){
+        let type=e.currentTarget.dataset.type;
+        this.data.params.type=type;
+        this.setData({
+          params:this.data.params
+        })
+      },
+      bindInputChange(e){
+        let type=e.currentTarget.dataset.type;
+        let value=e.detail.value;
+        this.data.params[type]=value;
+        let key='params.'+type;
+        this.setData({
+          [key]:value
+        })
+      },
+      //添加选项列表
+      addOptionList(){
+        this.data.params.optionList.push({optionContent:''});
+        let key='params.optionList';
+        this.setData({
+          [key]:this.data.params.optionList
+        });
+        this.getStus();
+      },
+      //删除选项
+      removeOptionItem(e){
+        let index=e.currentTarget.dataset.index;
+        this.data.params.optionList.splice(index,1);
+        this.setData({
+          'params.optionList':this.data.params.optionList
+        })
+      },
+      //选项值绑定
+      optionBindInput(e){
+        let index=e.currentTarget.dataset.index;
+        let val=e.detail.value;
+        this.data.params.optionList[index].optionContent=val;
+        this.setData({
+          'params.optionList':this.data.params.optionList
+        })
+      },
+      bindDateChange(e){
+        this.setData({
+          enddate:e.detail.value
+        });
+        if(now==e.detail.value){
+          this.data.startTime=dayjs().format('HH:mm');
+          this.setData({
+            startTime:this.data.startTime
+          });
+          let nowTime=parseInt(dayjs().format('HHmm'));
+          let _endTime=parseInt(this.data.endtime.replace(':',''));
+          if(_endTime<nowTime){
+            this.data.endtime=dayjs().format('HH:mm');
+            this.setData({
+              endtime:this.data.endtime
+            });
+          }
+        }else{
+          this.data.startTime='';
+          this.setData({
+            startTime:this.data.startTime
+          });
+        }
+      },
+      bindTimeChange(e){
+        this.setData({
+          endtime:e.detail.value
+        })
+      },
+      //更改隐私设置
+      privacyChange(e){
+        let type=e.currentTarget.dataset.type;
+        this.setData({
+          'params.privacy':type
+        })
+      },
+      //范围设置
+      rangeChange(){
+        this.setData({
+          'params.range':1,
+          selectedStus:[]
+        })
+      },
+      selectStu(e){
+        let index=e.currentTarget.dataset.index;
+        let userId=e.currentTarget.dataset.id;
+        if(this.data.selectedStus[index]){
+          this.data.selectedStus[index]=undefined;
+        }else{
+          this.data.selectedStus[index]=userId;
+        }
+
+        this.data.params.range=2;
+        this.setData({
+          selectedStus:this.data.selectedStus,
+          'params.range':2
+        })
+      },
+      toggleModal(e){
+        if(e.type && e.type=='modaltoggle'){
+          this.setData({
+            visable:e.detail
+          })
+        }else{
+          this.setData({
+            visable:!this.data.visable
+          })
+        }
+      },
+      //更改班级
+      bindClassChange(e){
+        let index=parseInt(e.detail.value);
+        this.data.params.classId=this.data.classList[index].classId;
+        this.data.params.range=1;
+        this.setData({
+          selectedClassIndex:index,
+          selectedStus:[],
+          'params.range':1
+        })
+        this.getStus();
+      },
+      back(){
+        this.$router.back();
+      },
+      hasMainteacherToggleModal(e){
+        if(e.type && e.type=='modaltoggle'){
+          this.$router.back();
+        }
+      },
+      async submit(){
+        wechat.showLoading();
+        if(this.data.params.title==''){
+          wx.hideLoading();
+          this.$toast('标题不能为空');
+          return false;
+        }
+        if(this.data.params.content==''){
+          wx.hideLoading();
+          this.$toast('内容不能为空');
+          return false;
+        }
+        if(this.data.params.type==2){
+          for(let i=0;i<this.data.params.optionList.length;i++){
+            if(this.data.params.optionList[i].optionContent==''){
+              wx.hideLoading();
+              this.$toast('选项值不能为空');
+              return false;
+              break;
+            }
+          }
+        }
+        let params=JSON.parse(JSON.stringify(this.data.params));
+        if(params.type==2){
+          params.endTime=this.data.enddate+' '+this.data.endtime;
+          params.endTime=params.endTime.replace(/-/g,'/');
+          params.endTime=dayjs(params.endTime);
+        }
+        if(params.range==2){
+          this.data.selectedStus.map((item)=>{
+            if(item){
+              params.userRelateList.push({userId:item});
+            }
+          })
+        }
+        let res=await this.$api.notice.create(params);
+        wx.hideLoading();
+        if(res.rcode==300){
+          this.$router.redirect(`/pages/notice/success?id=${res.data.noticeId}&className=${this.data.classList[this.data.selectedClassIndex].className}`);
+        }
+      },
+      //初始化数据
+      initData(){
+        this.setData({
+          imagesBase64List:[],
+          classList:[],
+          visable:false,
+          params:{
+            attachList:[],
+            classId:1,
+            content:'',
+            endTime:'',
+            optionList:[{optionContent:''}],
+            privacy:1,
+            range:1,
+            title:'',
+            type:1,
+            userRelateList:[],
+          },
+          enddate:dayjs(new Date()).add(1, 'day').format('YYYY-MM-DD'),
+          endtime:dayjs(new Date()).format('HH:mm'),
+          startDate:dayjs(new Date()).format('YYYY-MM-DD'),
+          startTime:'',
+          stus:[],
+          selectedStus:[],
+          selectedClassIndex:0,
+          hasMainteacher:false
+        });
+      },
+      //visableHideEnd
+      modelAnimateEnd(e){
+        debugger;
+      }
+    }
+
+  })
+</script>
+<style lang="scss" src="./publish.scss"></style>

@@ -1,0 +1,90 @@
+<config>
+  {
+    "navigationBarTitleText":"口算预览",
+    "usingComponents": {
+      "modal": "../../components/modal/modal.mina"
+    }
+  }
+</config>
+
+
+<template>
+  <view id="work-type" class="section">
+    <view class="section-top">
+      <text class="section-title">作业类型</text>
+    </view>
+    <view class="section-cont">
+      <view class="work-type-list">
+        <view class="work-type-item" catchtap="toPublisthNormal">
+          <view class="work-type-item-title">自主布置</view>
+          <view class="work-type-item-cont">自行编辑作业内容</view>
+          <image class="bg" src="~@/assets/images/work/normal.png"></image>
+        </view>
+        <view class="work-type-item" catchtap="toPublishKousuan">
+          <view class="work-type-item-title">数学口算</view>
+          <view class="work-type-item-cont">检查学生口算达标能力<text class="iconfont icon-question" catchtap="toggleModal"></text></view>
+          <image class="bg" src="~@/assets/images/work/kousuan.png"></image>
+        </view>
+      </view>
+
+      <view class="more">
+        更多作业类型敬请期待
+      </view>
+    </view>
+  </view>
+
+  <modal visable="{{visable}}" bindmodaltoggle="toggleModal">
+    <text slot="header">口算作业</text>
+    <view  slot="body">
+      <view class="kousuan-drsc">
+        <view>
+          1.老师可设定口算作业的时间及分数，用于检查学生口算是否达标；
+        </view>
+        <view>
+          2.每次作业在设定的时间内，答对1题得1分，答错则可以继续作答。
+        </view>
+      </view>
+    </view>
+    <view slot="footer" class="btn btn-primary btn-lg btn-block " catchtap="toggleModal">
+      知道了
+    </view>
+  </modal>
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import wechat from '@/until/wechat'
+
+  Page.define({
+    data: {
+      visable:false
+    },
+    async onLoad() {
+
+    },
+    onShow() {
+
+    },
+    methods: {
+      toggleModal(e){
+        if(e.type && e.type=='modaltoggle'){
+          this.setData({
+            visable:e.detail
+          });
+        }else{
+          this.setData({
+            visable:!this.data.visable
+          })
+        }
+      },
+      toPublisthNormal(){
+        this.$router.navigate(`/pages/work/publish`);
+      },
+      toPublishKousuan(){
+        this.$router.navigate(`/pages/work/publish?typeId=4`);
+      }
+    }
+
+  })
+</script>
+<style lang="scss" src="./type.scss"></style>

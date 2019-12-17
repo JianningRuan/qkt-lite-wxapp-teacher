@@ -1,0 +1,168 @@
+<config>
+  {
+    "navigationBarTitleText":"选择出题范围",
+    "usingComponents": {
+      "modal": "../../components/modal/modal.mina"
+    }
+  }
+</config>
+
+
+<template>
+  <view id="work-scope" class="section">
+    <view class="section-top flex flex-align-center">
+      <view class="section-title flex1">
+        选择范围
+      </view>
+      <view class="screen">
+        <picker bindchange="bindGardePickerChange" value="{{gradeIndex}}" range="{{gradeList}}" range-key="name">
+          <view class="picker">{{gradeList[gradeIndex].name}} <text class="iconfont icon-right"></text></view>
+        </picker>
+
+      </view>
+    </view>
+    <view class="work-scope-list section-cont">
+      <view class="work-scope-item flex flex-align-center" wx:for="{{ruleList}}" wx:key="{{index}}" catchtap="itemToggle" data-index="{{index}}">
+        <view class="cont flex1">
+          <view class="name">{{item.title}}</view>
+          <view class="drsc">例：{{item.example}}</view>
+        </view>
+        <text class="iconfont {{item.selected?'icon-selected':'icon-select'}}"></text>
+      </view>
+    </view>
+  </view>
+
+  <modal visable="{{visable}}" bindmodaltoggle="toggleModal">
+    <text slot="header">口算作业</text>
+    <view  slot="body">
+      <view class="kousuan-drsc">
+        <view>
+          1.老师可设定口算作业的时间及分数，用于检查学生口算是否达标；
+        </view>
+        <view>
+          2.每次作业在设定的时间内，答对1题得1分，答错则可以继续作答。
+        </view>
+      </view>
+    </view>
+    <view slot="footer" class="btn btn-primary btn-lg btn-block " catchtap="toggleModal">
+      知道了
+    </view>
+  </modal>
+
+  <view class="fixed-boootom">
+    <view class="btn btn-lg btn-primary btn-block" catchtap="retrunPage">确认</view>
+  </view>
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import wechat from '@/until/wechat'
+  import {tinax} from '@/store'
+  Page.define({
+    mixins: [
+      tinax.connect({
+        getters (getters) {
+          return {
+            scope: getters.getSelectScope(),
+          }
+        },
+        actions ({AddSelectScope,RemoveSelectScope}) {
+          return {
+            AddSelectScope,RemoveSelectScope
+          }
+        },
+      }),
+    ],
+    data: {
+      visable:false,
+      gradeList:[
+        {name:'全部年级',value:0},
+        {name:'一年级',value:1},
+        {name:'二年级',value:2},
+        {name:'三年级',value:3},
+        {name:'四年级',value:4},
+        {name:'五年级',value:5},
+        {name:'六年级',value:6},
+      ],
+      gradeIndex:0,
+      ruleList:[]
+    },
+    async onLoad(params) {
+      if(params.grade){
+        for (let i=0;i<this.data.gradeList.length;i++){
+          if(this.data.gradeList[i].value===parseInt(params.grade)){
+            this.setData({
+              gradeIndex:i
+            });
+            break;
+          }
+        }
+      }
+      this.getRuleList();
+    },
+    onShow() {
+
+    },
+    methods: {
+      toggleModal(e){
+        if(e.type && e.type=='modaltoggle'){
+          this.setData({
+            visable:e.detail
+          })
+        }else{
+          this.setData({
+            visable:!this.data.visable
+          })
+        }
+      },
+      toPublisthNormal(){
+        this.$router.navigate(`/pages/work/publish`);
+      },
+      toPublishKousuan(){
+        this.$router.navigate(`/pages/work/publish`);
+      },
+      //年级选项更改事件
+      bindGardePickerChange(e){
+        this.setData({
+          gradeIndex:e.detail.value
+        });
+        this.getRuleList();
+      },
+      async getRuleList(){
+        let res=await this.$api.calc.ruleList({grade:this.data.gradeList[this.data.gradeIndex].value});
+        if(res.rcode==300){
+          if(this.data.scope.length>0){
+            for (let i=0;i<this.data.scope.length;i++){
+              for(let u=0;u<res.data.ruleList.length;u++){
+                if(this.data.scope[i].id==res.data.ruleList[u].id){
+                  res.data.ruleList[u].selected=true;
+                }
+              }
+            }
+          }
+          this.setData({
+            ruleList:res.data.ruleList
+          })
+        }
+      },
+      itemToggle(e){
+        let index=parseInt(e.currentTarget.dataset.index);
+        if(this.data.ruleList[index].selected){
+          this.data.ruleList[index].selected=false;
+          this.RemoveSelectScope({item:this.data.ruleList[index]});
+        }else{
+          this.data.ruleList[index].selected=true;
+          this.AddSelectScope({item:this.data.ruleList[index]});
+        }
+        this.setData({
+          ruleList:this.data.ruleList
+        })
+      },
+      retrunPage(){
+        this.$router.back();
+      }
+    }
+
+  })
+</script>
+<style lang="scss" src="./scope.scss"></style>

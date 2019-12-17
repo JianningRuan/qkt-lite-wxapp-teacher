@@ -1,0 +1,69 @@
+<config>
+{
+  "window": {
+    "navigationBarBackgroundColor": "#8bd1e7",
+    "backgroundColor": "#ffffff"
+  },
+  "pages": [
+    "pages/login.mina",                 //登录
+    "pages/my.mina",                    //我的
+    "pages/message.mina",               //消息
+    "pages/work.mina",                  //作业
+    "pages/home.mina",                  //首页
+    "pages/notice/my.mina",             //消息-我发我的
+    "pages/notice/detail.mina",         //消息-详情
+    "pages/notice/list.mina",           //消息列表
+    "pages/notice/success.mina",        //消息发布成功
+    "pages/notice/publish.mina",        //消息发布
+    "pages/work/detail.mina",           //作业详情
+    "pages/work/info.mina",             //作业统计
+    "pages/work/publish.mina",          //作业发布
+    "pages/work/success.mina",          //作业发布成功
+    "pages/my/check.mina",              //我的-信息核对
+    "pages/my/examine.mina",              //我的-审核名单
+    "pages/my/invitation.mina",              //我的-二维码邀请
+  ],
+  "tabBar": {
+    "selectedColor":"#65c6e4",
+    "backgroundColor":"#ffffff",
+    "borderStyle":"#e5e5e5",
+    "list": [{
+    "pagePath": "pages/home",
+    "text": "首页",
+    "iconPath": "./assets/images/tabbar/index.png",
+    "selectedIconPath": "./assets/images/tabbar/index-active.png"
+    }, {
+    "pagePath": "pages/work",
+    "text": "作业",
+    "iconPath": "./assets/images/tabbar/work.png",
+    "selectedIconPath": "./assets/images/tabbar/work-active.png"
+    }, {
+    "pagePath": "pages/message",
+    "text": "消息",
+    "iconPath": "./assets/images/tabbar/message.png",
+    "selectedIconPath": "./assets/images/tabbar/message-active.png"
+    },{
+    "pagePath": "pages/my",
+    "text": "我的",
+    "iconPath": "./assets/images/tabbar/person.png",
+    "selectedIconPath": "./assets/images/tabbar/person-active.png"
+    }]
+  },
+}
+</config>
+
+<script>
+  import Tina from '@tinajs/tina'
+  import router from '@tinajs/tina-router'
+  import modal from '@tinajs/tina-modal'
+  import message from '@/plugin/message'
+  import api from '@/plugin/api'
+
+  Tina.use(router).use(modal).use(message).use(api);
+//  Tina.prototype.api=api;
+App({
+  onLaunch() {
+  },
+})
+</script>
+<style lang="scss" src="./app.scss"></style>

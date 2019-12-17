@@ -1,0 +1,55 @@
+<config>
+{
+  "navigationBarTitleText":"发送通知",
+  "usingComponents": {
+    "success": "../../components/success/success.mina"
+  }
+}
+</config>
+
+
+
+<template>
+  <success>
+    <text slot="title">发送成功</text>
+    <view slot="tips">
+      <view>通知已发布到<text>{{className}}</text>，你和同班家长</view>
+      <view>可以在小程序查看到</view>
+    </view>
+    <view slot="btn" class="flex flex-align-center btn-group">
+      <text class="btn btn-primary btn-lg btn-plain flex1" catchtap="toNoticePublish">继续发送</text>
+      <text class="btn btn-primary btn-lg flex1" catchtap="toNoticeDetail">查看通知</text>
+    </view>
+  </success>
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import wechat from '@/until/wechat'
+  Page.define({
+    data: {
+      noticeId:'',
+      className:''
+    },
+    async onLoad(){
+      if(this.$route.query.id){
+        this.data.noticeId=this.$route.query.id;
+      }
+      if(this.$route.query.className){
+        this.setData({
+          className:this.$route.query.className
+        });
+      }
+    },
+    methods:{
+      toNoticeDetail(){
+        this.$router.redirect(`/pages/notice/detail?id=${this.data.noticeId}`);
+      },
+      toNoticePublish(){
+        this.$router.redirect(`/pages/notice/publish`);
+      }
+    }
+
+  })
+</script>
+<style lang="scss" src="./success.scss"></style>

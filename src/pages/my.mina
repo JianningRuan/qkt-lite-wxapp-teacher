@@ -1,0 +1,94 @@
+<config>
+{
+  "navigationBarTitleText":"我的"
+}
+</config>
+
+
+
+<template>
+  <view id="tabbar-my">
+    <view class="top">
+      <view class="bg"></view>
+      <view class="userinfo flex flex-align-center">
+        <view class="userinfo-warp">
+          <view class="avatar">
+            <image src="{{info.pic}}" wx:if="{{info.pic && info.pic!=''}}"></image>
+            <image src="../assets/images/avatar.png" wx:else></image>
+          </view>
+          <view class="name">{{info.name}}</view>
+          <view class="school">{{info.schoolName}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="my-list">
+      <view class="my-item flex flex-align-center" catchtap="toMyInfo">
+        <view class="name flex1">个人资料</view>
+        <text class="iconfont icon-right"></text>
+      </view>
+      <view class="my-item flex flex-align-center" catchtap="toMyCheck" wx:if="{{!info.isCheck}}">
+        <view class="name flex1">带班信息</view>
+        <text class="iconfont icon-right"></text>
+      </view>
+      <view class="my-item flex flex-align-center" catchtap="openStu">
+        <view class="name flex1">切换学生角色</view>
+        <text class="iconfont icon-right"></text>
+      </view>
+      <view class="my-item conact flex flex-align-center">
+        <button open-type="contact">进入客服会话</button>
+        <view class="name flex1">意见反馈</view>
+        <text class="iconfont icon-right"></text>
+      </view>
+      <!--<view class="my-item flex flex-align-center">
+        <view class="name flex1">关于全课通</view>
+        <text class="iconfont icon-right"></text>
+      </view>-->
+    </view>
+  </view>
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import wechat from '@/until/wechat'
+  import {tinax} from '@/store'
+  Page.define({
+    mixins: [
+      tinax.connect({
+        getters (getters) {
+          return {
+            info: getters.getUserInfo(),
+          };
+        }
+      }),
+    ],
+    data: {
+
+    },
+    async onLoad(){
+      // this.toMyCheck() // 临时
+    },
+    onShow(){
+
+    },
+    methods:{
+      toMyCheck(){
+        this.$router.navigate(`/pages/my/check`);
+      },
+      toMyInfo(){
+        this.$router.navigate(`/pages/my/info`);
+      },
+      openStu(){
+        wx.navigateToMiniProgram({
+          appId: 'wx494a50b5886a3691',
+          envVersion: 'release',
+          success(res) {
+            // 打开成功
+          }
+        })
+      }
+    }
+
+  })
+</script>
+<style lang="scss" src="./my.scss"></style>

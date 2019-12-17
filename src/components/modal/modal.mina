@@ -1,0 +1,73 @@
+<config>
+{
+  "component": true
+}
+</config>
+
+<template>
+
+  <view class="x-modal flex flex-align-center"  animation="{{animation}}" bindanimationend="visableHideEnd">
+    <view class="modal-mask"></view>
+    <view class="modal-main">
+      <text class="iconfont icon-close modal-close" catchtap="closeModal"></text>
+      <view class="modal-header">
+        <slot name="header"></slot>
+      </view>
+      <view class="modal-body">
+        <slot name="body"></slot>
+      </view>
+      <view class="modal-footer">
+        <slot name="footer"></slot>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+Component({
+  properties: {
+    visable: { // 属性名
+      type: Boolean, // 类型（必填），目前接受的类型包括：String, Number, Boolean, Object, Array, null（表示任意类型）
+      value: false, // 属性初始值（可选），如果未指定则会根据类型选择一个
+      observer: function(newVal, oldVal, changedPath) {
+        let animate;
+        if(this.data.animate){
+          animate=wx.createAnimation({duration:250,delay:300,timingFunction:'ease-out'});
+        }else{
+          animate=wx.createAnimation({duration:0,delay:0,timingFunction:'ease-out'});
+        }
+        if(newVal){
+          animate.top(0).step();
+        }else{
+          animate.top('-100%').step();
+        }
+        this.setData({
+          animation:animate.export(),
+        })
+        // 属性被改变时执行的函数（可选），也可以写成在methods段中定义的方法名字符串, 如：'_propertyChange'
+        // 通常 newVal 就是新设置的数据， oldVal 是旧数据
+      }
+    },
+    animate:{
+      type: Boolean, // 类型（必填），目前接受的类型包括：String, Number, Boolean, Object, Array, null（表示任意类型）
+      value: true, // 属性初始值（可选），如果未指定则会根据类型选择一个
+    }
+  },
+  options: {
+    multipleSlots: true // 在组件定义时的选项中启用多slot支持
+  },
+  data:{
+    animation:[],
+    maskAnimation:[]
+  },
+  methods:{
+    closeModal(){
+      this.triggerEvent('modaltoggle', false)
+    },
+    visableHideEnd(){
+      this.triggerEvent('modelAnimateEnd', this.data.visable);
+    }
+  }
+})
+</script>
+<style lang="scss" src="./modal.scss"></style>

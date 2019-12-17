@@ -1,0 +1,55 @@
+<config>
+{
+  "component": true
+}
+</config>
+
+<template>
+  <view  class="scroller-top" animation="{{animation}}" catchtap="pageScrollToTop">
+    <text class="iconfont icon-top"></text>
+  </view>
+</template>
+
+<script>
+Component({
+  options: {
+    multipleSlots: true // 在组件定义时的选项中启用多slot支持
+  },
+  properties: {
+    scrollTop: { // 属性名
+      type: Number, // 类型（必填），目前接受的类型包括：String, Number, Boolean, Object, Array, null（表示任意类型）
+      value: 0, // 属性初始值（可选），如果未指定则会根据类型选择一个
+      observer: function(newVal, oldVal, changedPath) {
+        let animate=wx.createAnimation({duration:250,timingFunction:'ease-out'});
+        if(newVal>200){
+          animate.bottom(0).step();
+        }else{
+          animate.bottom('-100%').step();
+        }
+        this.setData({
+          animation:animate.export(),
+        })
+        // 属性被改变时执行的函数（可选），也可以写成在methods段中定义的方法名字符串, 如：'_propertyChange'
+        // 通常 newVal 就是新设置的数据， oldVal 是旧数据
+      }
+    },
+  },
+
+  data:{
+    active:false,
+    animation:[]
+  },
+  methods:{
+    pageScrollToTop(){
+      wx.pageScrollTo({
+        scrollTop: 0,
+        duration: 250
+      })
+    }
+  },
+  created(){
+
+  }
+})
+</script>
+<style lang="scss" src="./scroller-top.scss"></style>

@@ -1,0 +1,130 @@
+<config>
+{
+  "navigationBarTitleText":"作业列表",
+  "usingComponents": {
+    "scroller-top": "../../components/scroller-top/scroller-top.mina",
+    "is-null": "../../components/is-null/is-null.mina",
+    "pagation": "../../components/pagation/pagation.mina",
+  }
+}
+</config>
+
+
+
+<template>
+  <view class="work-list">
+    <block wx:if="{{works.length>0}}">
+      <view class="work-item" wx:for="{{works}}" wx:key="{{item.id}}" catchtap="toWorkInfo" data-id="{{item.id}}">
+        <view class="work-item-top flex flex-align-center">
+          <image class="icon" src="../../assets/images/work/icon.png"></image>
+          <view class="name flex1">{{item.title}}</view>
+          <view class="finish">完成：{{item.fStuTotal}}/{{item.fStuTotal+item.ufStuTotal}}</view>
+        </view>
+        <view class="work-item-bottom">
+          <view class="work-item-task" wx:for="{{item.homeworkItems}}" wx:for-item="task" wx:for-index="taskIndex" wx:key="{{taskIndex}}">
+            <block wx:if="{{task.type==4}}">
+              {{task.execTimeTotal}}分钟口算作业，达标分数{{task.execScore}}分
+            </block>
+            <block wx:else>
+              {{taskIndex+1}}.{{task.content}}
+            </block>
+          </view>
+        </view>
+      </view>
+      <pagation params="{{params}}"></pagation>
+    </block>
+    <block wx:else>
+      <is-null><text slot="tips">暂无布置作业</text> </is-null>
+    </block>
+  </view>
+  <scroller-top scrollTop="{{scrollTop}}"></scroller-top>
+</template>
+
+<script>
+  import {Page} from '@tinajs/tina'
+  import wechat from '@/until/wechat'
+  import { tinax } from '@/store'
+  Page.define({
+    mixins: [
+      tinax.connect({
+        getters (getters) {
+          return {
+            works: getters.getList(),
+          }
+        },
+        actions ({setList}) {
+          return {
+            setList,
+          }
+        },
+      }),
+    ],
+    data: {
+      params:{},
+      scrollTop:0,
+      params: {
+        classId:'',
+        page:1,
+        pageSize:12,
+        subjectId:0
+      }
+    },
+    async onLoad(){
+
+      this.data.params.page=1;
+      if(this.$route.query.classId){
+        this.data.params.classId=this.$route.query.classId;
+      }
+      if(this.$route.query.subjectId){
+        this.data.params.subjectId=this.$route.query.subjectId;
+      }
+      this.getWorkList(true);
+    },
+    onShow(){
+      console.log(this);
+      console.log(tinax);
+    },
+    methods:{
+      async getWorkList(cover){
+        let res=await this.$api.work.get(this.data.params);
+        if(res.rcode==300){
+          this.data.params.totalPage=Math.ceil(res.data.total/this.data.params.pageSize);
+          if(cover){
+            this.setList({list:res.data.list});
+          }else{
+            this.setList({list:this.data.works.concat(res.data.list)});
+          }
+          this.setData({
+            params:this.data.params
+          })
+        }
+      },
+      toWorkInfo(e){
+        let id=e.currentTarget.dataset.id;
+        this.$router.navigate(`/pages/work/info?id=${id}`);
+      },
+    },
+    onPageScroll({scrollTop}){
+      this.setData({
+        'scrollTop':scrollTop
+      })
+    },
+    async onReachBottom(){
+      if(!this.data.params.totalPage || (this.data.params.totalPage && this.data.params.page<this.data.params.totalPage)){
+        this.data.params.page++;
+        this.setData({
+          "params.loading":true
+        })
+        await this.getWorkList();
+        this.setData({
+          "params.loading":false
+        })
+      }else{
+        this.setData({
+          'params.nothing':true
+        })
+      }
+    },
+  })
+</script>
+<style lang="scss" src="./list.scss"></style>
